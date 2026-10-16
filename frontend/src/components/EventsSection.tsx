@@ -1,21 +1,67 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
-import { events } from '../data/events'
-import type { CommunityEvent } from '../data/events'
+import { getEvents } from '../services/api'
+import type { CommunityEvent } from '../types/event'
 
 type EventsSectionProps = {
   fullPage?: boolean
 }
 
 function EventsSection({ fullPage = false }: EventsSectionProps) {
-  const [selectedEvent, setSelectedEvent] = useState<CommunityEvent | null>(null)
+  // Data dari backend
+  const [events, setEvents] = useState<CommunityEvent[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [reloadKey, setReloadKey] = useState(0)
+
+  // Event yang sedang dibuka di popup
+  const [selectedEvent, setSelectedEvent] =
+    useState<CommunityEvent | null>(null)
 
   const trackRef = useRef<HTMLDivElement>(null)
   const dialogRef = useRef<HTMLDialogElement>(null)
 
   const visibleEvents = fullPage ? events : events.slice(0, 6)
   const Heading = fullPage ? 'h1' : 'h2'
+  const hasEvents = !isLoading && error === null && events.length > 0
 
+  // Ambil daftar event dari API
+  useEffect(() => {
+    const controller = new AbortController()
+
+    async function loadEvents() {
+      setIsLoading(true)
+      setError(null)
+
+      try {
+        const result = await getEvents(controller.signal)
+
+        if (!controller.signal.aborted) {
+          setEvents(result.data)
+        }
+      } catch (error) {
+        if (controller.signal.aborted) return
+
+        console.error('Gagal memuat events:', error)
+
+        setError(
+          'Kegiatan belum berhasil dimuat. Coba lagi sebentar, ya.',
+        )
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    void loadEvents()
+
+    return () => {
+      controller.abort()
+    }
+  }, [reloadKey])
+
+  // Buka popup dan hentikan scroll halaman belakang
   useEffect(() => {
     if (!selectedEvent) return
 
@@ -59,6 +105,7 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
       className={`events-section ${fullPage ? 'events-page' : ''}`}
       id="events"
     >
+      {/* Judul dan kontrol carousel */}
       <div className="events-heading">
         <div>
           <p className="eyebrow">LIFE TOGETHER LOOKS LIKE THIS</p>
@@ -76,7 +123,7 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
             Selalu ada cerita yang bisa kita bawa pulang.
           </p>
 
-          {!fullPage && (
+          {!fullPage && hasEvents && (
             <div className="carousel-controls">
               <button
                 type="button"
@@ -102,58 +149,102 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
         </div>
       </div>
 
-      <div
-        className={fullPage ? 'events-grid' : 'events-track'}
-        id="events-track"
-        ref={trackRef}
-        role="region"
-        aria-label={
-          fullPage ? 'Semua kegiatan komunitas' : 'Carousel kegiatan komunitas'
-        }
-        tabIndex={fullPage ? undefined : 0}
-      >
-        {visibleEvents.map((event, index) => (
-          <article className="event-card" key={event.id}>
-            <div className="event-image">
-              <span className="event-image-placeholder" aria-hidden="true">
-                ADULLAM
-                <br />
-                TOGETHER.
-              </span>
+      {/* Loading */}
+      {isLoading && (
+        <div className="events-status" role="status">
+          <p>Lagi mengambil cerita dari ADULLAM...</p>
+        </div>
+      )}
 
-              <img
-                src={event.image}
-                alt={`Kegiatan ${event.category} ADULLAM Youth`}
-                loading="lazy"
-                onError={(error) => {
-                  error.currentTarget.style.display = 'none'
-                }}
-              />
+      {/* Gagal mengambil data */}
+      {!isLoading && error && (
+        <div className="events-status" role="alert">
+          <p>{error}</p>
 
-              <span className="event-category">{event.category}</span>
-            </div>
+          <button
+            type="button"
+            className="button"
+            onClick={() => setReloadKey((value) => value + 1)}
+          >
+            Coba lagi
+          </button>
+        </div>
+      )}
 
-            <div className="event-content">
-              <span className="event-number">
-                / {String(index + 1).padStart(2, '0')}
-              </span>
+      {/* Data kosong */}
+      {!isLoading && !error && events.length === 0 && (
+        <div className="events-status" role="status">
+          <p>
+            Belum ada kegiatan yang dipublikasikan.
+            Nantikan ceritanya!
+          </p>
+        </div>
+      )}
 
-              <h3>{event.title}</h3>
+      {/* Cards hanya ditampilkan setelah data berhasil dimuat */}
+      {hasEvents && (
+        <div
+          className={fullPage ? 'events-grid' : 'events-track'}
+          id="events-track"
+          ref={trackRef}
+          role="region"
+          aria-label={
+            fullPage
+              ? 'Semua kegiatan komunitas'
+              : 'Carousel kegiatan komunitas'
+          }
+          tabIndex={fullPage ? undefined : 0}
+        >
+          {visibleEvents.map((event, index) => (
+            <article className="event-card" key={event.id}>
+              <div className="event-image">
+                <span
+                  className="event-image-placeholder"
+                  aria-hidden="true"
+                >
+                  ADULLAM
+                  <br />
+                  TOGETHER.
+                </span>
 
-              <button
-                type="button"
-                className="event-read-button"
-                aria-haspopup="dialog"
-                aria-label={`Baca cerita: ${event.title}`}
-                onClick={() => setSelectedEvent(event)}
-              >
-                Baca ceritanya <span aria-hidden="true">↗</span>
-              </button>
-            </div>
-          </article>
-        ))}
-      </div>
+                <img
+                  src={event.image}
+                  alt={`Kegiatan ${event.category} ADULLAM Youth`}
+                  loading="lazy"
+                  onError={(error) => {
+                    error.currentTarget.style.display = 'none'
+                  }}
+                />
 
+                <span className="event-category">
+                  {event.category}
+                </span>
+              </div>
+
+              <div className="event-content">
+                <span className="event-number">
+                  / {String(index + 1).padStart(2, '0')}
+                </span>
+
+                <h3>{event.title}</h3>
+
+                <button
+                  type="button"
+                  className="event-read-button"
+                  aria-haspopup="dialog"
+                  aria-label={`Baca cerita: ${event.title}`}
+                  onClick={() => setSelectedEvent(event)}
+                >
+                  Baca ceritanya
+                  <span aria-hidden="true">↗</span>
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+
+      {/* Link halaman Events */}
       {!fullPage && (
         <div className="events-footer">
           <p className="events-hint">
@@ -166,6 +257,7 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
         </div>
       )}
 
+      {/* Popup detail event */}
       <dialog
         ref={dialogRef}
         className="event-modal"
@@ -192,7 +284,10 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
             </button>
 
             <div className="event-modal-photo">
-              <span className="event-image-placeholder" aria-hidden="true">
+              <span
+                className="event-image-placeholder"
+                aria-hidden="true"
+              >
                 ADULLAM
                 <br />
                 TOGETHER.
@@ -210,7 +305,11 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
 
             <div className="event-modal-copy">
               <p className="eyebrow">{selectedEvent.category}</p>
-              <h2 id="event-modal-title">{selectedEvent.title}</h2>
+
+              <h2 id="event-modal-title">
+                {selectedEvent.title}
+              </h2>
+
               <p className="event-modal-description">
                 {selectedEvent.description}
               </p>

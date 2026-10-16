@@ -1188,3 +1188,28 @@
     padding: 28px 6%;
   }
 }
+
+/* STATUS PENGAMBILAN DATA EVENTS */
+
+.events-status {
+  max-width: 1440px;
+  margin: auto;
+  padding: 32px 6%;
+}
+
+.events-status p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.events-status .button {
+  margin-top: 20px;
+  color: var(--brown);
+  cursor: pointer;
+}
+
+.events-track[hidden],
+.events-grid[hidden] {
+  display: none;
+}
