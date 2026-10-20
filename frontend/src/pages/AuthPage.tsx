@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from 'react'
 import type { FormEvent } from "react";
-import type { Session } from "@supabase/supabase-js";
+import { useAuth } from '../context/auth-context'
 import { Link } from "react-router";
 import { supabase } from "../lib/supabase";
 import AccountInfo from "../components/AccountInfo";
@@ -14,26 +14,13 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [session, setSession] = useState<Session | null>(null);
-  const [isChecking, setIsChecking] = useState(true);
+  const { session, isChecking, logout } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   const isSignup = mode === "signup";
-
-  // Mendengarkan sesi awal, login, dan logout.
-  useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-      setIsChecking(false);
-    });
-
-    return () => {
-      data.subscription.unsubscribe();
-    };
-  }, []);
 
   function changeMode() {
     setMode((current) => (current === "login" ? "signup" : "login"));
@@ -110,27 +97,23 @@ function AuthPage() {
   }
 
   async function handleLogout() {
-    setIsSubmitting(true);
-    setError(null);
-    setMessage(null);
+    setIsSubmitting(true)
+    setError(null)
+    setMessage(null)
 
     try {
-      const { error: authError } = await supabase.auth.signOut({
-        scope: "local",
-      });
+      await logout()
 
-      if (authError) throw authError;
-
-      setPassword("");
-      setMessage("Kamu sudah keluar dari akun.");
+      setPassword('')
+      setMessage('Kamu sudah keluar dari akun.')
     } catch (error) {
       setError(
         error instanceof Error
           ? error.message
-          : "Logout belum berhasil. Coba lagi.",
-      );
+          : 'Logout belum berhasil. Coba lagi.',
+      )
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
   }
 

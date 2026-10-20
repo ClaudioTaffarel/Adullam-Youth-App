@@ -710,3 +710,156 @@
     transform: translate(-10%, 37%);
   }
 }
+
+.auth-artwork {
+  z-index: 10;
+  pointer-events: none;
+  transform: translate(-18%, 37%);
+}
+
+/* ACCOUNT DROPDOWN */
+
+.site-header {
+  position: relative;
+  z-index: 30;
+}
+
+.nav-account-loading {
+  min-width: 130px;
+  color: #795c46;
+  font-size: 12px;
+  text-align: right;
+}
+
+.account-dropdown {
+  position: relative;
+  flex-shrink: 0;
+  max-width: 100%;
+}
+
+.account-dropdown > summary {
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.account-dropdown > summary::-webkit-details-marker {
+  display: none;
+}
+
+.account-dropdown > summary:focus-visible {
+  outline: 3px dashed var(--brown);
+  outline-offset: 5px;
+}
+
+.account-dropdown .account-entry-copy {
+  min-width: 0;
+}
+
+.account-dropdown .account-entry-copy strong {
+  display: block;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-avatar {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #fff8eb;
+  border-radius: 50%;
+  background: #f59553;
+  color: #38251d;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.account-chevron {
+  margin-inline: 5px 2px;
+  transition: transform 180ms ease;
+}
+
+.account-dropdown[open] .account-chevron {
+  transform: rotate(180deg);
+}
+
+.account-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 240px;
+  max-width: 88vw;
+  padding: 12px;
+  border: 2px solid var(--brown);
+  border-radius: 14px;
+  background: #fffaf0;
+  box-shadow: 5px 5px 0 #dba36d;
+}
+
+.account-dropdown-heading {
+  margin: 0 0 8px;
+  padding: 10px 12px 14px;
+  border-bottom: 1px dashed #c5a280;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 18px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.account-dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--brown);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.account-dropdown-item:hover {
+  background: #f5dfbe;
+}
+
+.account-dropdown-item:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.account-logout {
+  color: #a34422;
+}
+
+.account-dropdown-error {
+  margin: 8px 12px;
+  color: #8a2c19;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 760px) {
+  .account-dropdown .account-entry-copy strong {
+    max-width: 90px;
+  }
+
+  .nav-avatar {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-chevron {
+    transition: none;
+  }
+}
