@@ -10,7 +10,9 @@ import {
 import Navbar from './components/Navbar'
 import HomePage from './pages/HomePage'
 import EventsPage from './pages/EventsPage'
+import AuthPage from './pages/AuthPage'
 import './App.css'
+import './auth.css'
 
 function ScrollPosition() {
   const { pathname, hash } = useLocation()
@@ -35,7 +37,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/events" element={<EventsPage />} />
-
+        <Route path="/login" element={<AuthPage />} />
         <Route
           path="*"
           element={

@@ -1,6 +1,9 @@
+import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
-import { events } from './data/events.js'
+import { supabase } from './lib/supabase.js'
+import type { User } from '@supabase/supabase-js'
+import { requireAuth } from './middleware/requireAuth.js'
 
 const app = express()
 const port = Number(process.env.PORT ?? 3000)
@@ -13,7 +16,8 @@ app.use(
 
 app.use(express.json())
 
-// Endpoint untuk mengecek apakah server hidup.
+// Mengecek apakah server Express hidup.
+// Ini belum memeriksa koneksi database.
 app.get('/api/health', (_req, res) => {
   res.json({
     status: 'ok',
@@ -21,15 +25,60 @@ app.get('/api/health', (_req, res) => {
   })
 })
 
-// Endpoint untuk mengambil daftar kegiatan.
-app.get('/api/events', (_req, res) => {
+// Mengambil kegiatan yang sudah dipublikasikan.
+app.get('/api/events', async (_req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('events')
+      .select('id, title, category, image, description')
+      .eq('is_published', true)
+      .order('id', { ascending: true })
+
+    if (error) {
+      console.error('Supabase gagal membaca events:', error.message)
+
+      res.status(500).json({
+        message: 'Data kegiatan belum berhasil dimuat.',
+      })
+
+      return
+    }
+
+    const events = data ?? []
+
+    res.json({
+      data: events,
+      total: events.length,
+    })
+  } catch (error) {
+    console.error(
+      'Gagal mengambil events:',
+      error instanceof Error ? error.message : 'Unknown error',
+    )
+
+    res.status(500).json({
+      message: 'Terjadi masalah saat mengambil kegiatan.',
+    })
+  }
+})
+
+app.get('/api/me', requireAuth, (_req, res) => {
+  const user = res.locals.authUser as User
+
+  res.setHeader('Cache-Control', 'no-store')
+
   res.json({
-    data: events,
-    total: events.length,
+    data: {
+      id: user.id,
+      email: user.email ?? null,
+      name:
+        typeof user.user_metadata.display_name === 'string'
+          ? user.user_metadata.display_name
+          : 'Teman',
+    },
   })
 })
 
-// Respons untuk alamat API yang belum tersedia.
 app.use((_req, res) => {
   res.status(404).json({
     message: 'Endpoint tidak ditemukan.',

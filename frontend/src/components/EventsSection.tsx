@@ -102,7 +102,9 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
 
   return (
     <section
-      className={`events-section ${fullPage ? 'events-page' : ''}`}
+      className={`events-section ${
+        fullPage ? 'events-page' : 'events-home-pattern'
+      }`}
       id="events"
     >
       {/* Judul dan kontrol carousel */}
