@@ -41,6 +41,7 @@ export async function requireAuth(
 
     // Informasi ini hanya berlaku untuk request yang sedang diproses.
     res.locals.authUser = data.user
+    res.locals.accessToken = token
 
     next()
   } catch {

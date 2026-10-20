@@ -17,3 +17,13 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
     detectSessionInUrl: false,
   },
 })
+
+export function createUserClient(accessToken: string) {
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Konfigurasi Supabase belum lengkap.')
+  }
+
+  return createClient(supabaseUrl, supabaseKey, {
+    accessToken: async () => accessToken,
+  })
+}

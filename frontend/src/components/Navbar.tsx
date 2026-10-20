@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router'
 import { useAuth } from '../context/auth-context'
+import { useProfile } from '../context/profile-context'
 
 function Navbar() {
   const { session, isChecking, logout } = useAuth()
+  const { profile } = useProfile()
 
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [logoutError, setLogoutError] = useState<string | null>(null)
@@ -12,13 +14,7 @@ function Navbar() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const rawName = session?.user.user_metadata.display_name
-
-  const name =
-    typeof rawName === 'string' && rawName.trim()
-      ? rawName.trim()
-      : 'Teman'
-
+  const name = profile?.display_name.trim() || 'Teman'
   const firstName = name.split(/\s+/)[0]
   const initial = name.charAt(0).toUpperCase()
 

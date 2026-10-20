@@ -1,55 +1,63 @@
 import { useState } from 'react'
-import type { FormEvent } from "react";
+import type { FormEvent } from 'react'
+import { Link } from 'react-router'
+
 import { useAuth } from '../context/auth-context'
-import { Link } from "react-router";
-import { supabase } from "../lib/supabase";
-import AccountInfo from "../components/AccountInfo";
-import AuthArtwork from "../components/AuthArtwork";
+import { useProfile } from '../context/profile-context'
+import { supabase } from '../lib/supabase'
+import AccountInfo from '../components/AccountInfo'
+import AuthArtwork from '../components/AuthArtwork'
 
 function AuthPage() {
-  const [mode, setMode] = useState<"login" | "signup">("login");
-
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
   const { session, isChecking, logout } = useAuth()
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { profile } = useProfile()
 
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+  const [mode, setMode] = useState<'login' | 'signup'>('login')
 
-  const isSignup = mode === "signup";
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [message, setMessage] = useState<string | null>(null)
+
+  const isSignup = mode === 'signup'
+  const displayName = profile?.display_name.trim() || 'teman'
 
   function changeMode() {
-    setMode((current) => (current === "login" ? "signup" : "login"));
-    setError(null);
-    setMessage(null);
-    setPassword("");
+    setMode((current) => (current === 'login' ? 'signup' : 'login'))
+    setError(null)
+    setMessage(null)
+    setPassword('')
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+    event.preventDefault()
 
-    if (isSubmitting) return;
+    if (isSubmitting) return
 
-    setError(null);
-    setMessage(null);
+    setError(null)
+    setMessage(null)
 
-    if (isSignup && name.trim().length < 2) {
-      setError("Isi nama minimal dua karakter, ya.");
-      return;
+    const cleanName = name.trim()
+    const cleanPhone = phone.replace(/[\s()-]/g, '')
+
+    if (
+      isSignup &&
+      (cleanName.length < 2 || cleanName.length > 80)
+    ) {
+      setError('Nama harus terdiri dari 2 sampai 80 karakter.')
+      return
     }
-
-    const cleanPhone = phone.replace(/[\s()-]/g, "");
 
     if (isSignup && !/^\+?[0-9]{8,15}$/.test(cleanPhone)) {
-      setError("Isi nomor telepon yang valid, misalnya 081234567890.");
-      return;
+      setError('Isi nomor telepon yang valid, misalnya 081234567890.')
+      return
     }
 
-    setIsSubmitting(true);
+    setIsSubmitting(true)
 
     try {
       if (isSignup) {
@@ -58,45 +66,48 @@ function AuthPage() {
           password,
           options: {
             data: {
-              display_name: name.trim(),
+              display_name: cleanName,
               phone_number: cleanPhone,
             },
             emailRedirectTo: `${window.location.origin}/login`,
           },
-        });
+        })
 
-        if (authError) throw authError;
+        if (authError) throw authError
 
-        setPassword("");
+        setPassword('')
 
         if (!data.session) {
           setMessage(
-            "Cek email untuk melanjutkan pendaftaran. " +
-              "Jika akun sudah terdaftar, gunakan menu Masuk.",
-          );
+            'Cek email untuk melanjutkan pendaftaran. ' +
+              'Jika akun sudah terdaftar, gunakan menu Masuk.',
+          )
         }
       } else {
-        const { error: authError } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
-        });
+        const { error: authError } =
+          await supabase.auth.signInWithPassword({
+            email: email.trim(),
+            password,
+          })
 
-        if (authError) throw authError;
+        if (authError) throw authError
 
-        setPassword("");
+        setPassword('')
       }
     } catch (error) {
       setError(
         error instanceof Error
           ? error.message
-          : "Belum berhasil terhubung. Coba lagi sebentar.",
-      );
+          : 'Belum berhasil terhubung. Coba lagi sebentar.',
+      )
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
   }
 
   async function handleLogout() {
+    if (isSubmitting) return
+
     setIsSubmitting(true)
     setError(null)
     setMessage(null)
@@ -146,7 +157,7 @@ function AuthPage() {
             <p className="eyebrow">YOU’RE IN!</p>
 
             <h2 id="auth-card-title">
-              Halo, {session.user.user_metadata.display_name || "teman"}!
+              Halo, {displayName}!
             </h2>
 
             <AccountInfo key={session.user.id} />
@@ -168,63 +179,65 @@ function AuthPage() {
                 disabled={isSubmitting}
                 onClick={handleLogout}
               >
-                {isSubmitting ? "Sedang keluar..." : "Keluar dari akun"}
+                {isSubmitting ? 'Sedang keluar...' : 'Keluar dari akun'}
               </button>
             </div>
           </>
         ) : (
           <>
             <p className="eyebrow">
-              {isSignup ? "MAKE YOURSELF AT HOME" : "GOOD TO SEE YOU AGAIN"}
+              {isSignup ? 'MAKE YOURSELF AT HOME' : 'GOOD TO SEE YOU AGAIN'}
             </p>
 
             <h2 id="auth-card-title">
-              {isSignup ? "Kenalan dulu, yuk." : "Selamat datang lagi."}
+              {isSignup ? 'Kenalan dulu, yuk.' : 'Selamat datang lagi.'}
             </h2>
 
             <p className="auth-description">
               {isSignup
-                ? "Buat akun untuk bergabung bersama kita."
-                : "Masuk menggunakan email dan password kamu."}
+                ? 'Buat akun untuk bergabung bersama kita.'
+                : 'Masuk menggunakan email dan password kamu.'}
             </p>
 
             <form onSubmit={handleSubmit}>
               <fieldset className="auth-fields" disabled={isSubmitting}>
                 {isSignup && (
-                  <div className="auth-field">
-                    <label htmlFor="auth-name">Nama</label>
-                    <input
-                      id="auth-name"
-                      type="text"
-                      autoComplete="name"
-                      value={name}
-                      onChange={(event) => setName(event.target.value)}
-                      minLength={2}
-                      maxLength={80}
-                      required
-                    />
-                  </div>
-                )}
+                  <>
+                    <div className="auth-field">
+                      <label htmlFor="auth-name">Nama</label>
 
-                {isSignup && (
-                  <div className="auth-field">
-                    <label htmlFor="auth-phone">Nomor telepon</label>
+                      <input
+                        id="auth-name"
+                        type="text"
+                        autoComplete="name"
+                        value={name}
+                        onChange={(event) => setName(event.target.value)}
+                        minLength={2}
+                        maxLength={80}
+                        required
+                      />
+                    </div>
 
-                    <input
-                      id="auth-phone"
-                      type="tel"
-                      autoComplete="tel"
-                      placeholder="081234567890"
-                      value={phone}
-                      onChange={(event) => setPhone(event.target.value)}
-                      maxLength={20}
-                      required
-                    />
-                  </div>
+                    <div className="auth-field">
+                      <label htmlFor="auth-phone">Nomor telepon</label>
+
+                      <input
+                        id="auth-phone"
+                        type="tel"
+                        autoComplete="tel"
+                        placeholder="081234567890"
+                        value={phone}
+                        onChange={(event) => setPhone(event.target.value)}
+                        maxLength={20}
+                        required
+                      />
+                    </div>
+                  </>
                 )}
 
                 <div className="auth-field">
                   <label htmlFor="auth-email">Email</label>
+
                   <input
                     id="auth-email"
                     type="email"
@@ -237,11 +250,12 @@ function AuthPage() {
 
                 <div className="auth-field">
                   <label htmlFor="auth-password">Password</label>
+
                   <input
                     id="auth-password"
                     type="password"
                     autoComplete={
-                      isSignup ? "new-password" : "current-password"
+                      isSignup ? 'new-password' : 'current-password'
                     }
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
@@ -266,30 +280,30 @@ function AuthPage() {
 
                 <button className="button auth-submit" type="submit">
                   {isSubmitting
-                    ? "Sedang diproses..."
+                    ? 'Sedang diproses...'
                     : isSignup
-                      ? "Buat akun"
-                      : "Masuk"}
+                      ? 'Buat akun'
+                      : 'Masuk'}
                 </button>
               </fieldset>
             </form>
 
             <p className="auth-bottom">
-              {isSignup ? "Sudah punya akun?" : "Belum punya akun?"}{" "}
+              {isSignup ? 'Sudah punya akun?' : 'Belum punya akun?'}{' '}
               <button
                 type="button"
                 className="auth-switch"
                 onClick={changeMode}
                 disabled={isSubmitting}
               >
-                {isSignup ? "Masuk" : "Daftar dulu"}
+                {isSignup ? 'Masuk' : 'Daftar dulu'}
               </button>
             </p>
           </>
         )}
       </section>
     </main>
-  );
+  )
 }
 
-export default AuthPage;
+export default AuthPage

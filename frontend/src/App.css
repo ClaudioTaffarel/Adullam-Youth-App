@@ -1427,3 +1427,55 @@
 .account-info .auth-switch {
   justify-self: start;
 }
+
+.profile-panel {
+  min-width: 0;
+}
+
+.profile-panel .account-identity {
+  min-width: 0;
+}
+
+.profile-panel .account-email {
+  overflow-wrap: anywhere;
+}
+
+.profile-phone {
+  display: block;
+  font-size: 0.875rem;
+  opacity: 0.75;
+}
+
+.profile-edit-trigger {
+  margin-top: 0.85rem;
+}
+
+.profile-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.profile-edit-grid .auth-field {
+  min-width: 0;
+}
+
+.profile-edit-grid input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+.profile-edit-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .profile-edit-grid {
+    grid-template-columns: 1fr;
+  }
+}

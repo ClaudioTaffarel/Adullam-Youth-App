@@ -67,3 +67,71 @@ export async function getMyAccount(
 
   return result
 }
+
+export type Profile = {
+  id: string
+  display_name: string
+  phone_number: string | null
+  email: string | null
+  created_at: string
+}
+
+type ProfileResponse = {
+  data: Profile
+  message?: string
+}
+
+type ProfileInput = {
+  display_name: string
+  phone_number: string
+}
+
+async function requestProfile(
+  method: 'GET' | 'PATCH',
+  input?: ProfileInput,
+  signal?: AbortSignal,
+): Promise<Profile> {
+  if (!API_URL) {
+    throw new Error('Alamat API belum dikonfigurasi.')
+  }
+
+  const { data, error } = await supabase.auth.getSession()
+
+  if (error) throw error
+
+  if (!data.session) {
+    throw new Error('Silakan login terlebih dahulu.')
+  }
+
+  const response = await fetch(`${API_URL}/api/profile`, {
+    method,
+    signal,
+    headers: {
+      Authorization: `Bearer ${data.session.access_token}`,
+      ...(input ? { 'Content-Type': 'application/json' } : {}),
+    },
+    body: input ? JSON.stringify(input) : undefined,
+  })
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null)
+
+    throw new Error(
+      typeof body?.message === 'string'
+        ? body.message
+        : 'Permintaan profil belum berhasil.',
+    )
+  }
+
+  const body: ProfileResponse = await response.json()
+
+  return body.data
+}
+
+export function getMyProfile(signal?: AbortSignal) {
+  return requestProfile('GET', undefined, signal)
+}
+
+export function updateMyProfile(input: ProfileInput) {
+  return requestProfile('PATCH', input)
+}
