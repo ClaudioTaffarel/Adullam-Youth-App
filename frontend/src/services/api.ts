@@ -72,6 +72,7 @@ export type Profile = {
   id: string
   display_name: string
   phone_number: string | null
+  avatar_path: string | null
   email: string | null
   created_at: string
 }
@@ -134,4 +135,88 @@ export function getMyProfile(signal?: AbortSignal) {
 
 export function updateMyProfile(input: ProfileInput) {
   return requestProfile('PATCH', input)
+}
+
+export async function uploadMyAvatar(file: File): Promise<Profile> {
+  const extensions: Record<string, string> = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+  }
+
+  const extension = extensions[file.type]
+
+  if (!extension) {
+    throw new Error('Gunakan foto JPG, PNG, atau WebP.')
+  }
+
+  if (file.size === 0 || file.size > 2 * 1024 * 1024) {
+    throw new Error('Ukuran foto harus lebih dari 0 dan maksimal 2 MB.')
+  }
+
+  if (!API_URL) {
+    throw new Error('Alamat API belum dikonfigurasi.')
+  }
+
+  const { data, error } = await supabase.auth.getSession()
+
+  if (error) throw error
+
+  const session = data.session
+
+  if (!session) {
+    throw new Error('Silakan login terlebih dahulu.')
+  }
+
+  // Setiap foto mendapatkan nama unik.
+  const avatarPath =
+    `${session.user.id}/${crypto.randomUUID()}.${extension}`
+
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(avatarPath, file, {
+      contentType: file.type,
+      upsert: false,
+    })
+
+  if (uploadError) {
+    throw new Error(`Upload belum berhasil: ${uploadError.message}`)
+  }
+
+  // Ambil sesi lagi untuk memastikan pengguna masih sama.
+  const { data: latestData, error: sessionError } =
+    await supabase.auth.getSession()
+
+  if (sessionError) throw sessionError
+
+  const latestSession = latestData.session
+
+  if (!latestSession || latestSession.user.id !== session.user.id) {
+    throw new Error('Sesi akun berubah. Silakan masuk kembali.')
+  }
+
+  const response = await fetch(`${API_URL}/api/profile/avatar`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${latestSession.access_token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      avatar_path: avatarPath,
+    }),
+  })
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null)
+
+    throw new Error(
+      typeof body?.message === 'string'
+        ? body.message
+        : 'Foto sudah di-upload, tetapi profil belum berhasil diperbarui.',
+    )
+  }
+
+  const body: ProfileResponse = await response.json()
+
+  return body.data
 }

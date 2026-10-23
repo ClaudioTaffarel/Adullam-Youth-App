@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router'
 import { useAuth } from '../context/auth-context'
 import { useProfile } from '../context/profile-context'
+import Avatar from './Avatar'
 
 function Navbar() {
   const { session, isChecking, logout } = useAuth()
@@ -16,7 +17,6 @@ function Navbar() {
 
   const name = profile?.display_name.trim() || 'Teman'
   const firstName = name.split(/\s+/)[0]
-  const initial = name.charAt(0).toUpperCase()
 
   function closeMenu() {
     if (menuRef.current) {
@@ -123,9 +123,11 @@ function Navbar() {
             className="account-entry"
             aria-label={`Pilihan akun ${name}`}
           >
-            <span className="nav-avatar" aria-hidden="true">
-              {initial}
-            </span>
+            <Avatar
+              path={profile?.avatar_path ?? null}
+              name={name}
+              className="nav-avatar"
+            />
 
             <span className="account-entry-copy">
               <strong>{firstName}</strong>

@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { getMyProfile, updateMyProfile } from '../services/api'
 import type { Profile } from '../services/api'
+import Avatar from './Avatar'
+import AvatarUploader from './AvatarUploader'
+import ChangePassword from './ChangePassword'
 
 function AccountInfo() {
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -16,6 +19,7 @@ function AccountInfo() {
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [attempt, setAttempt] = useState(0)
+  const [isChangingPassword, setIsChangingPassword] = useState(false)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -136,6 +140,14 @@ function AccountInfo() {
     )
   }
 
+  if (isChangingPassword) {
+    return (
+      <ChangePassword
+        onBack={() => setIsChangingPassword(false)}
+      />
+    )
+  }
+
   return (
     <div className="profile-panel">
       {isEditing ? (
@@ -191,9 +203,11 @@ function AccountInfo() {
       ) : (
         <>
           <div className="account-info account-pass">
-            <div className="account-avatar" aria-hidden="true">
-              {profile.display_name.trim().charAt(0).toUpperCase() || 'A'}
-            </div>
+            <Avatar
+              path={profile.avatar_path}
+              name={profile.display_name}
+              className="account-avatar"
+            />
 
             <div className="account-identity">
               <span className="eyebrow">
@@ -214,13 +228,25 @@ function AccountInfo() {
             <span className="account-pass-label">YOU BELONG HERE</span>
           </div>
 
-          <button
-            type="button"
-            className="auth-switch profile-edit-trigger"
-            onClick={startEditing}
-          >
-            Edit profil ↗
-          </button>
+          <div className="profile-tools">
+            <AvatarUploader />
+
+            <button
+              type="button"
+              className="profile-action-button"
+              onClick={startEditing}
+            >
+              Edit profil ↗
+            </button>
+
+            <button
+              type="button"
+              className="profile-action-button"
+              onClick={() => setIsChangingPassword(true)}
+            >
+              Ganti password ↗
+            </button>
+          </div>
         </>
       )}
 

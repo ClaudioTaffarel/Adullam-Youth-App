@@ -863,3 +863,329 @@
     transition: none;
   }
 }
+
+.profile-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.profile-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar.nav-avatar {
+  width: 36px;
+  height: 36px;
+}
+
+.profile-avatar.account-avatar {
+  width: 64px;
+  height: 64px;
+}
+
+.avatar-uploader {
+  margin-top: 1rem;
+}
+
+.avatar-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar-upload-preview {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border: 2px solid #38251c;
+  border-radius: 16px;
+  box-shadow: 3px 3px 0 #38251c;
+  transform: rotate(-3deg);
+}
+
+.avatar-upload-options {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.avatar-upload-options > .auth-switch {
+  justify-self: start;
+}
+
+.avatar-upload-options small {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.avatar-upload-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.4rem;
+}
+
+.avatar-upload-actions .button {
+  padding: 0.6rem 0.9rem;
+  font-size: 0.8rem;
+}
+
+.avatar-uploader button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.profile-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: start;
+  gap: 0.5rem;
+
+  padding: 0.65rem 1rem;
+  border: 2px solid #38251c;
+  border-radius: 12px;
+
+  background: #fff2d6;
+  color: #38251c;
+  box-shadow: 3px 3px 0 #38251c;
+
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+
+  transition:
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.profile-action-button:hover:not(:disabled) {
+  background: #ffc665;
+  box-shadow: 5px 5px 0 #38251c;
+  transform: translate(-2px, -2px);
+}
+
+.profile-action-button:active:not(:disabled) {
+  box-shadow: 0 0 0 #38251c;
+  transform: translate(3px, 3px);
+}
+
+.profile-action-button:focus-visible {
+  outline: 3px solid #d94c16;
+  outline-offset: 5px;
+}
+
+.profile-action-button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-action-button {
+    transition: none;
+  }
+
+  .profile-action-button:hover:not(:disabled),
+  .profile-action-button:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+.profile-tools {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.profile-tools > .avatar-uploader,
+.profile-tools > .profile-edit-trigger {
+  margin-top: 0;
+}
+
+.password-settings {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 2px dashed rgb(56 37 28 / 20%);
+}
+
+.password-form {
+  margin-top: 1rem;
+}
+
+.password-visibility {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.password-settings .password-visibility input {
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  accent-color: #d94c16;
+}
+
+.password-form small {
+  display: block;
+  margin-top: 0.5rem;
+  opacity: 0.7;
+}
+
+.password-settings button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.profile-tools {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 0.7rem;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.profile-tools > .avatar-uploader {
+  display: contents;
+}
+
+.profile-tools .avatar-upload-row,
+.profile-tools .avatar-upload-options {
+  display: contents;
+}
+
+.profile-tools > .profile-action-button,
+.profile-tools .avatar-upload-options > .profile-action-button {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  margin: 0;
+  padding: 0.65rem 0.4rem;
+
+  font-size: clamp(0.65rem, 1.1vw, 0.85rem);
+  line-height: 1.35;
+  text-align: center;
+  white-space: normal;
+}
+
+/* Preview dan aksi upload muncul di bawah baris tiga tombol. */
+.profile-tools .avatar-upload-preview,
+.profile-tools .avatar-upload-actions,
+.profile-tools .avatar-uploader > .auth-message {
+  grid-column: 1 / -1;
+  order: 1;
+}
+
+.profile-tools .avatar-upload-preview {
+  margin-top: 0.4rem;
+}
+
+.profile-tools .avatar-upload-actions {
+  margin-top: 0;
+}
+
+.password-editor {
+  min-width: 0;
+  padding: 1rem 0;
+}
+
+.password-editor-heading {
+  margin-bottom: 1rem;
+}
+
+.password-editor h3 {
+  margin: 0 0 0.75rem;
+  color: #38251c;
+  font-size: 1.4rem;
+}
+
+.password-editor .password-visibility {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.password-editor .password-visibility input {
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  accent-color: #d94c16;
+}
+
+@media (max-width: 480px) {
+  .profile-tools {
+    gap: 0.5rem;
+  }
+
+  .profile-tools .profile-action-button {
+    border-radius: 10px;
+    box-shadow: 2px 2px 0 #38251c;
+  }
+}
+
+/* Ukuran teks tombol konsisten di desktop dan HP. */
+.profile-tools > .profile-action-button,
+.profile-tools .avatar-upload-options > .profile-action-button {
+  font-size: 0.85rem;
+}
+
+/* Samakan ruang form password dengan form edit profil. */
+.password-editor {
+  margin: 0;
+  padding: 0;
+}
+
+.password-editor > form {
+  margin: 0;
+}
+
+.password-editor .profile-edit-actions .auth-switch {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #a83e1b;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Di HP, tiga tombol disusun ke bawah. */
+@media (max-width: 600px) {
+  .profile-tools {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+
+  .profile-tools > .profile-action-button,
+  .profile-tools .avatar-upload-options > .profile-action-button {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+  }
+}

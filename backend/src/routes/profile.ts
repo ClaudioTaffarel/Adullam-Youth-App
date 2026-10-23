@@ -24,7 +24,7 @@ profileRouter.get('/', async (_req, res) => {
   try {
     const { data: profile, error } = await userClient
       .from('profiles')
-      .select('id, display_name, phone_number, created_at')
+      .select('id, display_name, phone_number, avatar_path, created_at')
       .eq('id', user.id)
       .maybeSingle()
 
@@ -96,7 +96,7 @@ profileRouter.patch('/', async (req, res) => {
         phone_number: cleanPhone,
       })
       .eq('id', user.id)
-      .select('id, display_name, phone_number, created_at')
+      .select('id, display_name, phone_number, avatar_path, created_at')
       .maybeSingle()
 
     if (error) throw error
@@ -118,6 +118,87 @@ profileRouter.patch('/', async (req, res) => {
   } catch {
     res.status(500).json({
       message: 'Profil belum berhasil disimpan. Coba lagi sebentar.',
+    })
+  }
+})
+
+// PATCH /api/profile/avatar
+profileRouter.patch('/avatar', async (req, res) => {
+  const user = res.locals.authUser as User
+  const accessToken = res.locals.accessToken as string
+
+  const avatarPath: unknown = req.body?.avatar_path
+
+  if (typeof avatarPath !== 'string' || avatarPath.length > 200) {
+    res.status(400).json({
+      message: 'Lokasi foto tidak valid.',
+    })
+    return
+  }
+
+  const pathParts = avatarPath.split('/')
+  const folder = pathParts[0]
+  const filename = pathParts[1]
+
+  // Format yang diterima: ID pengguna/nama-file.ext
+  const validPath =
+    pathParts.length === 2 &&
+    folder === user.id &&
+    typeof filename === 'string' &&
+    /^[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp)$/.test(filename)
+
+  if (!validPath) {
+    res.status(400).json({
+      message: 'Foto harus berada di folder akunmu sendiri.',
+    })
+    return
+  }
+
+  const userClient = createUserClient(accessToken)
+
+  try {
+    // Periksa bahwa Storage mengizinkan akses ke foto ini.
+    const { data: signedFile, error: storageError } = await userClient
+      .storage
+      .from('avatars')
+      .createSignedUrl(avatarPath, 60)
+
+    if (storageError || !signedFile?.signedUrl) {
+      res.status(400).json({
+        message:
+          'Foto belum bisa diakses. Pastikan upload berhasil, lalu coba lagi.',
+      })
+      return
+    }
+
+    const { data: profile, error } = await userClient
+      .from('profiles')
+      .update({
+        avatar_path: avatarPath,
+      })
+      .eq('id', user.id)
+      .select('id, display_name, phone_number, avatar_path, created_at')
+      .maybeSingle()
+
+    if (error) throw error
+
+    if (!profile) {
+      res.status(404).json({
+        message: 'Profil belum ditemukan.',
+      })
+      return
+    }
+
+    res.json({
+      message: 'Foto profil berhasil diperbarui.',
+      data: {
+        ...profile,
+        email: user.email ?? null,
+      },
+    })
+  } catch {
+    res.status(500).json({
+      message: 'Foto profil belum berhasil disimpan. Coba lagi sebentar.',
     })
   }
 })
