@@ -171,6 +171,23 @@ profileRouter.patch('/avatar', async (req, res) => {
       return
     }
 
+    const { data: previousProfile, error: previousError } = await userClient
+      .from('profiles')
+      .select('avatar_path')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    if (previousError) throw previousError
+
+    if (!previousProfile) {
+      res.status(404).json({
+        message: 'Profil belum ditemukan.',
+      })
+      return
+    }
+
+    const previousAvatarPath = previousProfile.avatar_path as string | null
+
     const { data: profile, error } = await userClient
       .from('profiles')
       .update({
@@ -187,6 +204,39 @@ profileRouter.patch('/avatar', async (req, res) => {
         message: 'Profil belum ditemukan.',
       })
       return
+    }
+
+    const canRemovePrevious =
+      previousAvatarPath &&
+      previousAvatarPath !== avatarPath &&
+      previousAvatarPath.startsWith(`${user.id}/`)
+
+    if (canRemovePrevious) {
+      try {
+        // Periksa kembali agar foto yang sedang dipakai tidak dihapus.
+        const { data: latestProfile, error: latestError } = await userClient
+          .from('profiles')
+          .select('avatar_path')
+          .eq('id', user.id)
+          .maybeSingle()
+
+        if (latestError) {
+          console.warn('Pemeriksaan foto lama belum berhasil.')
+        } else if (
+          latestProfile &&
+          latestProfile.avatar_path !== previousAvatarPath
+        ) {
+          const { error: removeError } = await userClient.storage
+            .from('avatars')
+            .remove([previousAvatarPath])
+
+          if (removeError) {
+            console.warn('Foto lama belum berhasil dihapus.')
+          }
+        }
+      } catch {
+        console.warn('Pembersihan foto lama sedang tidak tersedia.')
+      }
     }
 
     res.json({

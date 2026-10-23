@@ -288,6 +288,14 @@ function AuthPage() {
               </fieldset>
             </form>
 
+            {!isSignup && (
+              <p className="forgot-password-link">
+                <Link className="auth-switch" to="/forgot-password">
+                  Lupa password?
+                </Link>
+              </p>
+            )}
+            
             <p className="auth-bottom">
               {isSignup ? 'Sudah punya akun?' : 'Belum punya akun?'}{' '}
               <button

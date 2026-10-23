@@ -13,6 +13,8 @@ import EventsPage from './pages/EventsPage'
 import AuthPage from './pages/AuthPage'
 import AuthProvider from './context/AuthProvider'
 import ProfileProvider from './context/ProfileProvider'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 
 import './App.css'
 import './auth.css'
@@ -47,6 +49,8 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/events" element={<EventsPage />} />
             <Route path="/login" element={<AuthPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             <Route
               path="*"
