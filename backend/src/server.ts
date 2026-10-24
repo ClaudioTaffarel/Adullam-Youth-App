@@ -5,6 +5,7 @@ import { supabase } from './lib/supabase.js'
 import type { User } from '@supabase/supabase-js'
 import { requireAuth } from './middleware/requireAuth.js'
 import profileRouter from './routes/profile.js'
+import devotionsRouter from './routes/devotions.js'
 
 const app = express()
 const port = Number(process.env.PORT ?? 3000)
@@ -17,6 +18,7 @@ app.use(
 
 app.use(express.json())
 app.use('/api/profile', profileRouter)
+app.use('/api/devotions', devotionsRouter)
 
 // Mengecek apakah server Express hidup.
 // Ini belum memeriksa koneksi database.

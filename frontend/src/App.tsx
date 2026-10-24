@@ -15,6 +15,9 @@ import AuthProvider from './context/AuthProvider'
 import ProfileProvider from './context/ProfileProvider'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
+import DevotionPage from './pages/DevotionPage'
+import ProtectedRoute from './components/ProtectedRoute'
+import './community-pages.css'
 
 import './App.css'
 import './auth.css'
@@ -51,6 +54,14 @@ function App() {
             <Route path="/login" element={<AuthPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route
+              path="/devotion"
+              element={
+                <ProtectedRoute>
+                  <DevotionPage />
+                </ProtectedRoute>
+              }
+            />
 
             <Route
               path="*"

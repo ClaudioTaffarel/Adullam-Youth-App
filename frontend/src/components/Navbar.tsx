@@ -107,6 +107,15 @@ function Navbar() {
         >
           Events
         </NavLink>
+
+        <NavLink
+          to="/devotion"
+          className={({ isActive }) =>
+            `nav-link ${isActive ? 'active' : ''}`
+          }
+        >
+          Devotion
+        </NavLink>
       </nav>
 
       {isChecking ? (

@@ -1,16 +1,19 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link } from 'react-router'
+import { Link, useLocation, useNavigate } from 'react-router'
 
 import { useAuth } from '../context/auth-context'
 import { useProfile } from '../context/profile-context'
 import { supabase } from '../lib/supabase'
 import AccountInfo from '../components/AccountInfo'
-import AuthArtwork from '../components/AuthArtwork'
+import AuthLayout from '../components/AuthLayout'
 
 function AuthPage() {
   const { session, isChecking, logout } = useAuth()
   const { profile } = useProfile()
+
+  const location = useLocation()
+  const navigate = useNavigate()
 
   const [mode, setMode] = useState<'login' | 'signup'>('login')
 
@@ -25,6 +28,18 @@ function AuthPage() {
 
   const isSignup = mode === 'signup'
   const displayName = profile?.display_name.trim() || 'teman'
+
+  const returnTo =
+    location.state?.from === '/devotion'
+      ? '/devotion'
+      : null
+
+  // Kembali ke Devotion jika pengguna datang dari halaman tersebut.
+  useEffect(() => {
+    if (!isChecking && session && returnTo) {
+      navigate(returnTo, { replace: true })
+    }
+  }, [isChecking, session, returnTo, navigate])
 
   function changeMode() {
     setMode((current) => (current === 'login' ? 'signup' : 'login'))
@@ -129,30 +144,19 @@ function AuthPage() {
   }
 
   return (
-    <main className="auth-page">
-      <section className="auth-story">
-        <p className="eyebrow">ADULLAM YOUTH / YOUR LITTLE HOME</p>
-
-        <h1>
-          Ceritamu
-          <br />
-          <span>punya tempat.</span>
-        </h1>
-
-        <p>Berbagi cerita, mengenal Tuhan, dan bertumbuh bersama.</p>
-
-        <span className="auth-sticker">#SemuaOrangDiterima</span>
-
-        <AuthArtwork />
-      </section>
-
-      <section className="auth-card" aria-labelledby="auth-card-title">
-        {isChecking ? (
+    <AuthLayout>
+      {isChecking ? (
+        <>
+          <h2 id="auth-card-title">Sebentar, ya.</h2>
+          <p role="status">Sedang memeriksa sesi login...</p>
+        </>
+      ) : session ? (
+        returnTo ? (
           <>
-            <h2 id="auth-card-title">Sebentar, ya.</h2>
-            <p role="status">Sedang memeriksa sesi login...</p>
+            <h2 id="auth-card-title">Kamu sudah masuk!</h2>
+            <p role="status">Sedang membuka halaman Devotion...</p>
           </>
-        ) : session ? (
+        ) : (
           <>
             <p className="eyebrow">YOU’RE IN!</p>
 
@@ -183,134 +187,136 @@ function AuthPage() {
               </button>
             </div>
           </>
-        ) : (
-          <>
-            <p className="eyebrow">
-              {isSignup ? 'MAKE YOURSELF AT HOME' : 'GOOD TO SEE YOU AGAIN'}
-            </p>
+        )
+      ) : (
+        <>
+          <p className="eyebrow">
+            {isSignup ? 'MAKE YOURSELF AT HOME' : 'GOOD TO SEE YOU AGAIN'}
+          </p>
 
-            <h2 id="auth-card-title">
-              {isSignup ? 'Kenalan dulu, yuk.' : 'Selamat datang lagi.'}
-            </h2>
+          <h2 id="auth-card-title">
+            {isSignup ? 'Kenalan dulu, yuk.' : 'Selamat datang lagi.'}
+          </h2>
 
-            <p className="auth-description">
-              {isSignup
-                ? 'Buat akun untuk bergabung bersama kita.'
+          <p className="auth-description">
+            {isSignup
+              ? 'Buat akun untuk bergabung bersama kita.'
+              : returnTo
+                ? 'Masuk dulu untuk membaca dan berbagi renungan bersama.'
                 : 'Masuk menggunakan email dan password kamu.'}
-            </p>
+          </p>
 
-            <form onSubmit={handleSubmit}>
-              <fieldset className="auth-fields" disabled={isSubmitting}>
-                {isSignup && (
-                  <>
-                    <div className="auth-field">
-                      <label htmlFor="auth-name">Nama</label>
+          <form onSubmit={handleSubmit}>
+            <fieldset className="auth-fields" disabled={isSubmitting}>
+              {isSignup && (
+                <>
+                  <div className="auth-field">
+                    <label htmlFor="auth-name">Nama</label>
 
-                      <input
-                        id="auth-name"
-                        type="text"
-                        autoComplete="name"
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                        minLength={2}
-                        maxLength={80}
-                        required
-                      />
-                    </div>
+                    <input
+                      id="auth-name"
+                      type="text"
+                      autoComplete="name"
+                      value={name}
+                      onChange={(event) => setName(event.target.value)}
+                      minLength={2}
+                      maxLength={80}
+                      required
+                    />
+                  </div>
 
-                    <div className="auth-field">
-                      <label htmlFor="auth-phone">Nomor telepon</label>
+                  <div className="auth-field">
+                    <label htmlFor="auth-phone">Nomor telepon</label>
 
-                      <input
-                        id="auth-phone"
-                        type="tel"
-                        autoComplete="tel"
-                        placeholder="081234567890"
-                        value={phone}
-                        onChange={(event) => setPhone(event.target.value)}
-                        maxLength={20}
-                        required
-                      />
-                    </div>
-                  </>
-                )}
+                    <input
+                      id="auth-phone"
+                      type="tel"
+                      autoComplete="tel"
+                      placeholder="081234567890"
+                      value={phone}
+                      onChange={(event) => setPhone(event.target.value)}
+                      maxLength={20}
+                      required
+                    />
+                  </div>
+                </>
+              )}
 
-                <div className="auth-field">
-                  <label htmlFor="auth-email">Email</label>
+              <div className="auth-field">
+                <label htmlFor="auth-email">Email</label>
 
-                  <input
-                    id="auth-email"
-                    type="email"
-                    autoComplete="email"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    required
-                  />
-                </div>
+                <input
+                  id="auth-email"
+                  type="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                />
+              </div>
 
-                <div className="auth-field">
-                  <label htmlFor="auth-password">Password</label>
+              <div className="auth-field">
+                <label htmlFor="auth-password">Password</label>
 
-                  <input
-                    id="auth-password"
-                    type="password"
-                    autoComplete={
-                      isSignup ? 'new-password' : 'current-password'
-                    }
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    minLength={isSignup ? 8 : undefined}
-                    required
-                  />
+                <input
+                  id="auth-password"
+                  type="password"
+                  autoComplete={
+                    isSignup ? 'new-password' : 'current-password'
+                  }
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  minLength={isSignup ? 8 : undefined}
+                  required
+                />
 
-                  {isSignup && <small>Gunakan minimal 8 karakter.</small>}
-                </div>
+                {isSignup && <small>Gunakan minimal 8 karakter.</small>}
+              </div>
 
-                {error && (
-                  <p className="auth-message auth-error" role="alert">
-                    {error}
-                  </p>
-                )}
+              {error && (
+                <p className="auth-message auth-error" role="alert">
+                  {error}
+                </p>
+              )}
 
-                {message && (
-                  <p className="auth-message auth-success" role="status">
-                    {message}
-                  </p>
-                )}
+              {message && (
+                <p className="auth-message auth-success" role="status">
+                  {message}
+                </p>
+              )}
 
-                <button className="button auth-submit" type="submit">
-                  {isSubmitting
-                    ? 'Sedang diproses...'
-                    : isSignup
-                      ? 'Buat akun'
-                      : 'Masuk'}
-                </button>
-              </fieldset>
-            </form>
-
-            {!isSignup && (
-              <p className="forgot-password-link">
-                <Link className="auth-switch" to="/forgot-password">
-                  Lupa password?
-                </Link>
-              </p>
-            )}
-            
-            <p className="auth-bottom">
-              {isSignup ? 'Sudah punya akun?' : 'Belum punya akun?'}{' '}
-              <button
-                type="button"
-                className="auth-switch"
-                onClick={changeMode}
-                disabled={isSubmitting}
-              >
-                {isSignup ? 'Masuk' : 'Daftar dulu'}
+              <button className="button auth-submit" type="submit">
+                {isSubmitting
+                  ? 'Sedang diproses...'
+                  : isSignup
+                    ? 'Buat akun'
+                    : 'Masuk'}
               </button>
+            </fieldset>
+          </form>
+
+          {!isSignup && (
+            <p className="forgot-password-link">
+              <Link className="auth-switch" to="/forgot-password">
+                Lupa password?
+              </Link>
             </p>
-          </>
-        )}
-      </section>
-    </main>
+          )}
+
+          <p className="auth-bottom">
+            {isSignup ? 'Sudah punya akun?' : 'Belum punya akun?'}{' '}
+            <button
+              type="button"
+              className="auth-switch"
+              onClick={changeMode}
+              disabled={isSubmitting}
+            >
+              {isSignup ? 'Masuk' : 'Daftar dulu'}
+            </button>
+          </p>
+        </>
+      )}
+    </AuthLayout>
   )
 }
 

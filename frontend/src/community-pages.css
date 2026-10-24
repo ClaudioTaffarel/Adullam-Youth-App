@@ -1,0 +1,472 @@
+/* Background bergerak, masing-masing halaman punya motif sendiri. */
+.devotion-page,
+.events-section.events-page {
+  position: relative;
+  isolation: isolate;
+}
+
+.devotion-page::before,
+.events-section.events-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Devotion: garis diagonal peach. */
+.devotion-page {
+  min-height: calc(100svh - 90px);
+  padding: clamp(2rem, 5vw, 5rem) clamp(1rem, 5vw, 5rem);
+  background: #f9e4d8;
+  color: #38251c;
+}
+
+.devotion-page::before {
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0,
+    transparent 32px,
+    rgb(171 75 43 / 8%) 32px,
+    rgb(171 75 43 / 8%) 34px
+  );
+
+  background-size: 96px 96px;
+  animation: community-pattern-drift 14s linear infinite;
+}
+
+/* Events page: grid kuning butter. */
+.events-section.events-page {
+  background: #fff0bb;
+}
+
+.events-section.events-page::before {
+  background-image:
+    linear-gradient(
+      to right,
+      rgb(128 87 30 / 10%) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      rgb(128 87 30 / 10%) 1px,
+      transparent 1px
+    );
+
+  background-size: 64px 64px;
+  animation: events-pattern-drift 12s linear infinite;
+}
+
+@keyframes community-pattern-drift {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: -96px 0;
+  }
+}
+
+@keyframes events-pattern-drift {
+  from {
+    background-position: 0 0, 0 0;
+  }
+
+  to {
+    background-position: -64px 0, -64px 0;
+  }
+}
+
+.devotion-container {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+.devotion-heading {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  align-items: end;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.devotion-heading h1 {
+  margin: 0.75rem 0 0;
+  font-size: clamp(3rem, 7vw, 6rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.devotion-heading h1 span {
+  color: #a94727;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 500;
+}
+
+.devotion-intro {
+  max-width: 390px;
+  justify-self: end;
+}
+
+.devotion-intro p {
+  margin: 1rem 0 0;
+  line-height: 1.7;
+}
+
+.devotion-date {
+  display: inline-block;
+  padding: 0.55rem 0.85rem;
+  border: 1.5px solid #38251c;
+  border-radius: 999px;
+  background: #fff9ef;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.devotion-note {
+  position: relative;
+  box-sizing: border-box;
+  max-width: 680px;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 2px solid #38251c;
+  border-radius: 4px 28px 5px 5px;
+  background: #fffaf0;
+  box-shadow: 7px 7px 0 #bd7654;
+}
+
+.devotion-note::before {
+  content: "";
+  position: absolute;
+  top: -11px;
+  right: 30px;
+  width: 85px;
+  height: 23px;
+  border: 1px solid rgb(56 37 28 / 12%);
+  background: rgb(235 179 105 / 65%);
+  transform: rotate(5deg);
+}
+
+.devotion-note-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: #a94727;
+}
+
+.devotion-note h2 {
+  max-width: 440px;
+  margin: 1rem 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  line-height: 1.1;
+}
+
+.devotion-note p {
+  max-width: 490px;
+  margin: 0;
+  line-height: 1.8;
+}
+
+.devotion-note-footer {
+  display: inline-block;
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #a94727;
+}
+
+.member-loading {
+  display: grid;
+  min-height: 50svh;
+  place-items: center;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .devotion-heading {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .devotion-intro {
+    max-width: none;
+    justify-self: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .devotion-page::before,
+  .events-section.events-page::before {
+    animation: none;
+  }
+}
+
+.devotion-page {
+  padding: clamp(1.5rem, 4vw, 3rem) 1rem 4rem;
+}
+
+.devotion-board {
+  width: 100%;
+  max-width: 1100px;
+  margin-inline: auto;
+}
+
+.devotion-composer {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 700px;
+  margin-inline: auto;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+
+  border: 2px solid #38251c;
+  border-radius: 24px;
+  background: #fffaf0;
+  box-shadow: 6px 6px 0 #bd7654;
+}
+
+.devotion-composer::before {
+  content: "";
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  width: 80px;
+  height: 22px;
+
+  border: 1px solid rgb(56 37 28 / 15%);
+  background: #edc79d;
+  transform: translateX(-50%) rotate(-3deg);
+}
+
+.devotion-composer h1 {
+  margin: 0 0 1.75rem;
+  color: #38251c;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  line-height: 1.15;
+  text-align: center;
+}
+
+.devotion-form {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.devotion-reference-fields {
+  display: grid;
+  grid-template-columns: 1.5fr 0.7fr 1fr;
+  gap: 0.85rem;
+}
+
+.devotion-field {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.devotion-field label {
+  color: #38251c;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.devotion-field input,
+.devotion-field textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 0.85rem 0.9rem;
+
+  border: 1.5px solid #bf967b;
+  border-radius: 12px;
+  background: #fffdf8;
+  color: #38251c;
+
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.devotion-field textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.devotion-field input::placeholder,
+.devotion-field textarea::placeholder {
+  color: #927b6c;
+  opacity: 1;
+}
+
+.devotion-field input:focus-visible,
+.devotion-field textarea:focus-visible {
+  border-color: #a94727;
+  outline: 3px solid rgb(169 71 39 / 16%);
+  outline-offset: 2px;
+}
+
+.devotion-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.devotion-character-count {
+  color: #806758;
+  font-size: 0.75rem;
+}
+
+.devotion-publish {
+  font-size: 0.9rem;
+}
+
+.devotion-publish:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.devotion-divider {
+  width: 100%;
+  height: 0;
+  margin: 2.5rem 0 1.75rem;
+  border: 0;
+  border-top: 2px dashed rgb(56 37 28 / 30%);
+}
+
+.devotion-feed h2 {
+  margin: 0 0 1.5rem;
+  color: #38251c;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.6rem;
+  text-align: center;
+}
+
+.devotion-feed-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+@media (max-width: 800px) {
+  .devotion-feed-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .devotion-reference-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .devotion-reference-fields > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .devotion-feed-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .devotion-publish {
+    width: 100%;
+  }
+
+  .devotion-composer {
+    border-radius: 18px;
+    box-shadow: 4px 4px 0 #bd7654;
+  }
+}
+
+.devotion-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.devotion-feed-status {
+  margin: 1.5rem 0;
+  color: #806758;
+  text-align: center;
+}
+
+.devotion-feed-grid {
+  align-items: start;
+}
+
+.devotion-entry {
+  min-width: 0;
+  padding: 1.4rem;
+  border: 2px solid #38251c;
+  border-radius: 18px 18px 6px 18px;
+  background: #fffaf0;
+  box-shadow: 4px 4px 0 #bd7654;
+  animation: devotion-card-arrive 280ms ease-out both;
+}
+
+.devotion-entry:nth-child(3n + 2) {
+  background: #fff0c9;
+}
+
+.devotion-entry:nth-child(3n + 3) {
+  background: #fbe1ce;
+}
+
+.devotion-entry-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.8rem;
+}
+
+.devotion-entry-header strong {
+  overflow-wrap: anywhere;
+  color: #38251c;
+  font-size: 0.9rem;
+}
+
+.devotion-entry-header time {
+  color: #806758;
+  font-size: 0.7rem;
+}
+
+.devotion-entry h3 {
+  margin: 1rem 0 0.75rem;
+  color: #a94727;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.3rem;
+  overflow-wrap: anywhere;
+}
+
+.devotion-entry-text {
+  margin: 0;
+  color: #38251c;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+@keyframes devotion-card-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .devotion-entry {
+    animation: none;
+  }
+}
