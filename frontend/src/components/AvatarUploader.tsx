@@ -119,7 +119,7 @@ function AvatarUploader() {
             disabled={isUploading}
             onClick={() => inputRef.current?.click()}
           >
-            {file ? 'Pilih foto lain' : 'Ganti foto profil ↗'}
+            {file ? 'Pilih foto lain' : 'Ganti foto profil'}
           </button>
 
           {file && (

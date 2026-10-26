@@ -91,7 +91,9 @@
   background: var(--yellow);
   box-shadow: 4px 4px 0 var(--brown);
   font-weight: 700;
-  transition: transform 180ms ease, box-shadow 180ms ease;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .button:hover {
@@ -158,15 +160,12 @@
 }
 
 .community-strip {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 24px;
-  padding: 20px;
+  position: relative;
+  overflow: hidden;
   border-block: 2px solid var(--brown);
   background: var(--yellow);
-  font-size: 13px;
-  font-weight: 900;
+  font-size: 14px;
+  font-weight: 800;
   letter-spacing: 1px;
 }
 
@@ -221,8 +220,7 @@
   }
 
   .community-strip {
-    gap: 14px;
-    font-size: 11px;
+    font-size: 12px;
   }
 }
 
@@ -269,10 +267,12 @@
   letter-spacing: -5px;
 }
 
-.memory-copy h1 span {
+.memory-copy h1 em {
   color: #71351e;
   font-family: Georgia, 'Times New Roman', serif;
   font-style: italic;
+  position: relative;
+  display: inline-block;
 }
 
 .memory-description {
@@ -399,9 +399,7 @@
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  background:
-    linear-gradient(145deg, transparent 50%, #b45a37 50%),
-    #e7b471;
+  background: linear-gradient(145deg, transparent 50%, #b45a37 50%), #e7b471;
 }
 
 .photo-placeholder {
@@ -440,13 +438,13 @@
 @keyframes memory-flight {
   0% {
     opacity: 0;
-    transform: translate(105%, var(--float-y))
-      rotate(calc(var(--tilt) + 12deg)) scale(0.75);
+    transform: translate(105%, var(--float-y)) rotate(calc(var(--tilt) + 12deg))
+      scale(0.75);
   }
   12% {
     opacity: 1;
-    transform: translate(65%, calc(var(--float-y) - 15px))
-      rotate(var(--tilt)) scale(0.96);
+    transform: translate(65%, calc(var(--float-y) - 15px)) rotate(var(--tilt))
+      scale(0.96);
   }
   38% {
     opacity: 1;
@@ -589,6 +587,356 @@
   }
 }
 
+/* SCROLL REVEAL — visibility is controlled only when IntersectionObserver is ready. */
+[data-reveal-state='pending'] {
+  opacity: 0;
+}
+[data-reveal-state='visible'] {
+  animation: section-arrive 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes section-arrive {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* CONTINUOUS COMMUNITY STRIP */
+.community-marquee {
+  display: flex;
+  width: max-content;
+  animation: community-roll 55s linear infinite;
+}
+.community-marquee-group {
+  display: flex;
+  flex: 0 0 auto;
+  min-width: 100vw;
+}
+.community-marquee-set {
+  display: flex;
+  flex: 1 0 auto;
+  align-items: center;
+}
+.community-marquee-item {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  white-space: nowrap;
+  padding-block: 20px;
+}
+.community-marquee-item i {
+  padding-inline: 28px;
+  font-style: normal;
+  color: #ab4f27;
+}
+.community-marquee.is-paused,
+.community-strip:hover .community-marquee {
+  animation-play-state: paused;
+}
+.marquee-toggle {
+  position: absolute;
+  right: 8px;
+  bottom: 3px;
+  padding: 2px 8px;
+  border: 1px solid var(--brown);
+  border-radius: 20px;
+  background: var(--yellow);
+  color: var(--brown);
+  font-size: 10px;
+  cursor: pointer;
+}
+@keyframes community-roll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* HERO TYPE + HELLO BUTTON */
+.hero-title-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.15em;
+  margin-bottom: -0.15em;
+}
+.hero-title-line > span {
+  display: block;
+  animation: hero-type-arrive 850ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.hero-title-line:nth-child(2) > span {
+  animation-delay: 160ms;
+}
+.memory-copy h1 em::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.04em;
+  height: 4px;
+  background: #71351e;
+  border-radius: 50%;
+  transform-origin: left;
+  animation: hello-underline 650ms 700ms both;
+}
+@keyframes hero-type-arrive {
+  from {
+    transform: translateY(110%) rotate(3deg);
+  }
+  to {
+    transform: translateY(0) rotate(0);
+  }
+}
+@keyframes hello-underline {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.hero-hello {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 23px 10px 10px;
+  border: 2px solid var(--brown);
+  border-radius: 999px;
+  background: var(--cream);
+  box-shadow: 5px 5px 0 var(--brown);
+  font-weight: 800;
+  transition:
+    background 220ms,
+    box-shadow 220ms;
+}
+.hello-face {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1.5px solid var(--brown);
+  border-radius: 50%;
+  background: var(--yellow);
+  transition: transform 350ms ease;
+}
+.hello-face svg {
+  width: 30px;
+  height: 30px;
+}
+.hero-hello:hover,
+.hero-hello:focus-visible {
+  background: var(--yellow);
+  box-shadow: 7px 7px 0 var(--brown);
+}
+.hero-hello:hover .hello-face,
+.hero-hello:focus-visible .hello-face {
+  transform: rotate(-18deg) scale(1.08);
+}
+.hero-hello:active {
+  box-shadow: 1px 1px 0 var(--brown);
+}
+
+/* ABOUT DETAILS */
+.home-about-photo::before {
+  content: '';
+  position: absolute;
+  inset: 22px 8px 0 22px;
+  border: 1px dashed #b88752;
+  border-radius: 8px;
+  transform: rotate(4deg);
+}
+.meeting-label {
+  margin-bottom: 10px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.meeting-label i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #b74616;
+  box-shadow: 0 0 0 4px #f6e0bd;
+}
+
+/* EVENT INTERACTION + DECORATION */
+.event-read-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+.event-card:focus-within {
+  outline: 3px dashed #a84c29;
+  outline-offset: 5px;
+}
+.event-card:active {
+  transform: scale(0.985);
+}
+.event-title-line {
+  display: block;
+}
+.events-heading[data-reveal-state='visible'] .event-title-line {
+  animation: event-type-arrive 650ms both;
+}
+.events-heading[data-reveal-state='visible'] .event-title-line:nth-child(2) {
+  animation-delay: 150ms;
+}
+.event-doodle {
+  width: 210px;
+  color: var(--brown);
+}
+.event-doodle svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+.doodle-photo-back {
+  transform-origin: 85px 75px;
+  animation: photo-back-sway 5s ease-in-out infinite;
+}
+.doodle-photo-front {
+  transform-origin: 143px 82px;
+  animation: photo-front-sway 5s ease-in-out infinite;
+}
+.doodle-orbit {
+  animation: orbit-dash 12s linear infinite;
+}
+@keyframes event-type-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes photo-back-sway {
+  0%,
+  100% {
+    transform: rotate(-16deg) translateY(2px);
+  }
+  50% {
+    transform: rotate(-9deg) translateY(-4px);
+  }
+}
+@keyframes photo-front-sway {
+  0%,
+  100% {
+    transform: rotate(9deg) translateY(-3px);
+  }
+  50% {
+    transform: rotate(15deg) translateY(3px);
+  }
+}
+@keyframes orbit-dash {
+  to {
+    stroke-dashoffset: -88;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .home-about-photo:hover .about-photo-frame {
+    transform: rotate(-1deg) translateY(-5px);
+    box-shadow: 12px 13px 0 var(--brown);
+  }
+  .home-about-photo:hover .about-photo-frame img {
+    transform: scale(1.055);
+  }
+  .home-about-photo:hover .about-photo-label {
+    transform: rotate(-2deg) translateY(-5px);
+  }
+  .about-meeting:hover {
+    background: #ffedc5;
+    padding-inline: 14px;
+  }
+  .event-card:hover {
+    transform: translateY(-7px) rotate(-0.6deg);
+    box-shadow: 8px 11px 0 var(--brown);
+  }
+  .event-card:nth-child(even):hover {
+    transform: translateY(-7px) rotate(0.6deg);
+  }
+  .event-card:hover .event-image img {
+    transform: scale(1.065);
+  }
+  .event-card:hover .event-category {
+    transform: rotate(-4deg) translateY(-3px);
+  }
+  .event-card:hover .event-read-button {
+    color: #a84c29;
+  }
+}
+@media (max-width: 760px) {
+  .events-page .events-heading {
+    position: relative;
+    padding-right: 100px;
+    min-height: 140px;
+  }
+  .events-page .events-intro {
+    position: absolute;
+    right: 3%;
+    top: -20px;
+  }
+  .event-doodle {
+    width: 90px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal-state],
+  .hero-title-line > span,
+  .memory-copy h1 em::after,
+  .events-heading[data-reveal-state='visible'] .event-title-line,
+  .doodle-photo-back,
+  .doodle-photo-front,
+  .doodle-orbit,
+  .community-marquee {
+    animation: none;
+    opacity: 1;
+    translate: none;
+  }
+  .community-marquee {
+    width: 100%;
+  }
+  .community-marquee-group {
+    min-width: 0;
+    width: 100%;
+  }
+  .community-marquee-group:nth-child(2),
+  .community-marquee-set:not(:first-child),
+  .marquee-toggle {
+    display: none;
+  }
+  .community-marquee-set {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .community-marquee-item {
+    padding-block: 10px;
+  }
+  .hero-hello,
+  .hello-face,
+  .event-card,
+  .event-category,
+  .about-photo-frame,
+  .about-photo-frame img,
+  .about-photo-label,
+  .about-meeting {
+    transition: none;
+  }
+  .event-card:hover,
+  .event-card:nth-child(even):hover,
+  .event-card:active {
+    transform: none;
+  }
+}
+
 /* COMMUNITY EVENTS */
 
 .events-section {
@@ -619,7 +967,7 @@
   letter-spacing: -2px;
 }
 
-.events-heading :is(h1, h2) span {
+.events-heading :is(h1, h2) em {
   color: #a84c29;
   font-family: Georgia, 'Times New Roman', serif;
   font-style: italic;
@@ -651,7 +999,9 @@
   color: var(--brown);
   font-size: 24px;
   cursor: pointer;
-  transition: background 180ms ease, transform 180ms ease;
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
 }
 
 .carousel-arrow:hover {
@@ -665,7 +1015,7 @@
   gap: 24px;
   max-width: 1440px;
   margin: auto;
-  padding: 12px 6% 28px;
+  padding: 22px 6% 32px;
   overflow-x: auto;
   scroll-snap-type: x proximity;
   scroll-padding-inline: 6%;
@@ -679,6 +1029,10 @@
 }
 
 .event-card {
+  position: relative;
+  transition:
+    transform 260ms ease,
+    box-shadow 260ms ease;
   flex: 0 0 360px;
   overflow: hidden;
   border: 2px solid var(--brown);
@@ -686,6 +1040,7 @@
   background: var(--cream);
   box-shadow: 5px 5px 0 var(--brown);
   scroll-snap-align: start;
+  cursor: pointer;
 }
 
 .event-image {
@@ -726,11 +1081,8 @@
   transition: transform 450ms ease;
 }
 
-.event-card:hover .event-image img {
-  transform: scale(1.04);
-}
-
 .event-category {
+  transition: transform 260ms ease;
   position: absolute;
   bottom: 16px;
   left: 16px;
@@ -881,6 +1233,7 @@
 /* ABOUT: FOTO KIRI, CERITA KANAN */
 
 .home-about {
+  scroll-margin-top: 28px;
   display: grid;
   grid-template-columns: 0.85fr 1.15fr;
   align-items: center;
@@ -897,6 +1250,9 @@
 }
 
 .about-photo-frame {
+  transition:
+    transform 500ms ease,
+    box-shadow 500ms ease;
   position: relative;
   aspect-ratio: 1 / 1;
   overflow: hidden;
@@ -920,6 +1276,7 @@
 }
 
 .about-photo-frame img {
+  transition: transform 700ms ease;
   position: absolute;
   inset: 0;
   width: 100%;
@@ -928,6 +1285,7 @@
 }
 
 .about-photo-label {
+  transition: transform 500ms ease;
   position: absolute;
   right: -12px;
   bottom: 24px;
@@ -960,12 +1318,15 @@
 }
 
 .about-meeting {
+  transition:
+    background 250ms ease,
+    padding 250ms ease;
   margin-top: 20px;
   padding-top: 16px;
   border-top: 2px solid var(--brown);
 }
 
-.about-meeting > span {
+.about-meeting > span:not(.meeting-label) {
   display: block;
   margin-bottom: 10px;
   font-size: 10px;
@@ -1486,4 +1847,77 @@
   justify-content: flex-end;
   gap: 12px;
   flex-shrink: 0;
+}
+
+.about-doodle {
+  position: absolute;
+  z-index: 2;
+  top: 15%;
+  left: -46px;
+  width: 76px;
+  color: #a84c29;
+  pointer-events: none;
+}
+
+.about-doodle svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.about-doodle-line {
+  stroke-dasharray: 1;
+  animation: about-sketch-draw 5s ease-in-out infinite;
+}
+
+.about-doodle-heart {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: about-heart-sway 3s ease-in-out infinite;
+}
+
+@keyframes about-sketch-draw {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  55%, 80% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes about-heart-sway {
+  0%, 100% {
+    transform: rotate(-9deg) scale(1);
+  }
+
+  50% {
+    transform: rotate(7deg) scale(1.08);
+  }
+}
+
+@media (max-width: 760px) {
+  .about-doodle {
+    left: -10px;
+    top: 6%;
+    width: 52px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-doodle-line,
+  .about-doodle-heart {
+    animation: none;
+  }
 }

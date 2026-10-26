@@ -1,24 +1,25 @@
+import CommunityMarquee from '../components/CommunityMarquee'
+import { useScrollReveal } from '../hooks/useScrollReveal'
 import MemoryHero from '../components/MemoryHero'
 import EventsSection from '../components/EventsSection'
 import DailyVerse from '../components/DailyVerse'
+import AboutDoodle from '../components/AboutDoodle'
 
 function HomePage() {
+  const pageRef = useScrollReveal<HTMLElement>()
   return (
-    <main>
+    <main ref={pageRef} data-reveal-scope>
       <MemoryHero />
 
-      <div className="community-strip">
-        <span>COME AS YOU ARE</span>
-        <span aria-hidden="true">/</span>
-        <span>LET&apos;S GROW TOGETHER</span>
-        <span aria-hidden="true">/</span>
-        <span>#SemuaOrangDiterima</span>
+      <CommunityMarquee />
+
+      <div data-reveal>
+        <DailyVerse />
       </div>
 
-      <DailyVerse />
-
       <section className="home-about" id="about">
-        <div className="home-about-photo">
+        <div className="home-about-photo" data-reveal>
+          <AboutDoodle />
           <div className="about-photo-frame">
             <span className="about-photo-placeholder" aria-hidden="true">
               OUR PEOPLE.
@@ -39,7 +40,7 @@ function HomePage() {
           <span className="about-photo-label">There’s room for you, too.</span>
         </div>
 
-        <div className="home-about-copy">
+        <div className="home-about-copy" data-reveal>
           <p className="eyebrow">A LITTLE ABOUT US</p>
 
           <h2>
@@ -50,11 +51,14 @@ function HomePage() {
 
           <p>
             ADULLAM Youth adalah tempat untuk berbagi cerita, mengenal Tuhan,
-            dan bertumbuh bareng. Dari komsel sampai jalan-jalan,
-            semua orang diterima di sini.
+            dan bertumbuh bareng. Dari komsel sampai jalan-jalan, semua orang
+            diterima di sini.
           </p>
 
           <div className="about-meeting">
+            <span className="meeting-label">
+              <i aria-hidden="true" /> SEE YOU THIS THURSDAY
+            </span>
             <strong>Kamis / 19.00–21.00 WIB</strong>
             <p>Prayer night sebulan sekali.</p>
           </div>

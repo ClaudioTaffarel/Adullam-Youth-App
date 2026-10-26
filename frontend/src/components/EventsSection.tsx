@@ -1,3 +1,5 @@
+import EventDoodle from './EventDoodle'
+import { useScrollReveal } from '../hooks/useScrollReveal'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { getEvents } from '../services/api'
@@ -15,9 +17,11 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
   const [reloadKey, setReloadKey] = useState(0)
 
   // Event yang sedang dibuka di popup
-  const [selectedEvent, setSelectedEvent] =
-    useState<CommunityEvent | null>(null)
+  const [selectedEvent, setSelectedEvent] = useState<CommunityEvent | null>(
+    null,
+  )
 
+  const sectionRef = useScrollReveal<HTMLElement>(events.length)
   const trackRef = useRef<HTMLDivElement>(null)
   const dialogRef = useRef<HTMLDialogElement>(null)
 
@@ -44,9 +48,7 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
 
         console.error('Gagal memuat events:', error)
 
-        setError(
-          'Kegiatan belum berhasil dimuat. Coba lagi sebentar, ya.',
-        )
+        setError('Kegiatan belum berhasil dimuat. Coba lagi sebentar, ya.')
       } finally {
         if (!controller.signal.aborted) {
           setIsLoading(false)
@@ -102,28 +104,37 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
 
   return (
     <section
+      ref={sectionRef}
+      data-reveal-scope
       className={`events-section ${
         fullPage ? 'events-page' : 'events-home-pattern'
       }`}
       id="events"
     >
       {/* Judul dan kontrol carousel */}
-      <div className="events-heading">
+      <div className="events-heading" data-reveal>
         <div>
           <p className="eyebrow">LIFE TOGETHER LOOKS LIKE THIS</p>
 
-          <Heading>
-            Good times.
-            <br />
-            <span>Better together.</span>
+          <Heading aria-label="Good times. Better together.">
+            <span className="event-title-line" aria-hidden="true">
+              Good times.
+            </span>
+            <span className="event-title-line" aria-hidden="true">
+              <em>Better together.</em>
+            </span>
           </Heading>
         </div>
 
         <div className="events-intro">
-          <p>
-            Dari Kamis malam sampai perjalanan bareng.
-            Selalu ada cerita yang bisa kita bawa pulang.
-          </p>
+          {fullPage ? (
+            <EventDoodle />
+          ) : (
+            <p>
+              Dari Kamis malam sampai perjalanan bareng. Selalu ada cerita yang
+              bisa kita bawa pulang.
+            </p>
+          )}
 
           {!fullPage && hasEvents && (
             <div className="carousel-controls">
@@ -176,10 +187,7 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
       {/* Data kosong */}
       {!isLoading && !error && events.length === 0 && (
         <div className="events-status" role="status">
-          <p>
-            Belum ada kegiatan yang dipublikasikan.
-            Nantikan ceritanya!
-          </p>
+          <p>Belum ada kegiatan yang dipublikasikan. Nantikan ceritanya!</p>
         </div>
       )}
 
@@ -188,6 +196,7 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
         <div
           className={fullPage ? 'events-grid' : 'events-track'}
           id="events-track"
+          data-reveal
           ref={trackRef}
           role="region"
           aria-label={
@@ -200,10 +209,7 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
           {visibleEvents.map((event, index) => (
             <article className="event-card" key={event.id}>
               <div className="event-image">
-                <span
-                  className="event-image-placeholder"
-                  aria-hidden="true"
-                >
+                <span className="event-image-placeholder" aria-hidden="true">
                   ADULLAM
                   <br />
                   TOGETHER.
@@ -218,9 +224,7 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
                   }}
                 />
 
-                <span className="event-category">
-                  {event.category}
-                </span>
+                <span className="event-category">{event.category}</span>
               </div>
 
               <div className="event-content">
@@ -238,7 +242,6 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
                   onClick={() => setSelectedEvent(event)}
                 >
                   Baca ceritanya
-                  <span aria-hidden="true">↗</span>
                 </button>
               </div>
             </article>
@@ -254,7 +257,7 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
           </p>
 
           <Link className="button" to="/events">
-            View all events <span aria-hidden="true">↗</span>
+            View all events
           </Link>
         </div>
       )}
@@ -286,10 +289,7 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
             </button>
 
             <div className="event-modal-photo">
-              <span
-                className="event-image-placeholder"
-                aria-hidden="true"
-              >
+              <span className="event-image-placeholder" aria-hidden="true">
                 ADULLAM
                 <br />
                 TOGETHER.
@@ -308,9 +308,7 @@ function EventsSection({ fullPage = false }: EventsSectionProps) {
             <div className="event-modal-copy">
               <p className="eyebrow">{selectedEvent.category}</p>
 
-              <h2 id="event-modal-title">
-                {selectedEvent.title}
-              </h2>
+              <h2 id="event-modal-title">{selectedEvent.title}</h2>
 
               <p className="event-modal-description">
                 {selectedEvent.description}

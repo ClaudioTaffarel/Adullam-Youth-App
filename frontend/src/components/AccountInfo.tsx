@@ -236,7 +236,7 @@ function AccountInfo() {
               className="profile-action-button"
               onClick={startEditing}
             >
-              Edit profil ↗
+              Edit profil
             </button>
 
             <button
@@ -244,7 +244,7 @@ function AccountInfo() {
               className="profile-action-button"
               onClick={() => setIsChangingPassword(true)}
             >
-              Ganti password ↗
+              Ganti password
             </button>
           </div>
         </>

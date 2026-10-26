@@ -31,19 +31,36 @@ function MemoryHero() {
         <div className="memory-copy">
           <p className="eyebrow">ADULLAM YOUTH / GROWING TOGETHER</p>
 
-          <h1>
-            Ada tempat
-            <br />
-            buat <span>kamu.</span>
+          <h1 aria-label="Ada tempat buat kamu.">
+            <span className="hero-title-line" aria-hidden="true">
+              <span>Ada tempat</span>
+            </span>
+            <span className="hero-title-line" aria-hidden="true">
+              <span>
+                buat <em>kamu.</em>
+              </span>
+            </span>
           </h1>
 
           <p className="memory-description">
-            Tempat buat kenalan, berbagi cerita, dan bertumbuh
-            bersama dalam Tuhan. Datang aja dulu, kita kenalan!
+            Tempat buat kenalan, berbagi cerita, dan bertumbuh bersama dalam
+            Tuhan. Datang aja dulu, kita kenalan!
           </p>
 
-          <a className="button" href="#about">
-            Kenalan sama kita <span aria-hidden="true">↗</span>
+          <a className="hero-hello" href="#about">
+            <span className="hello-face" aria-hidden="true">
+              <svg viewBox="0 0 32 32" fill="none">
+                <circle cx="11" cy="12" r="1.6" fill="currentColor" />
+                <circle cx="21" cy="12" r="1.6" fill="currentColor" />
+                <path
+                  d="M9 19Q16 26 23 19"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </span>
+            <span>Kenalan sama kita</span>
           </a>
 
           <p className="memory-footnote">KAMIS / 19.00–21.00 WIB</p>
@@ -52,8 +69,7 @@ function MemoryHero() {
         <div className="memory-stage" aria-hidden="true">
           <span className="memory-stage-note">
             a few moments,
-            <br />
-            a whole lot of love.
+            <br />a whole lot of love.
           </span>
 
           {memories.map((memory, index) => {
@@ -64,7 +80,11 @@ function MemoryHero() {
             } as CSSProperties
 
             return (
-              <figure className="flying-polaroid" style={style} key={memory.file}>
+              <figure
+                className="flying-polaroid"
+                style={style}
+                key={memory.file}
+              >
                 <div className="polaroid-picture">
                   <span className="photo-placeholder">ADULLAM MEMORIES</span>
 
