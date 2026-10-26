@@ -1,21 +1,14 @@
 import { Router } from 'express'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { createUserClient } from '../lib/supabase.js'
+import { BibleError, findBiblePassage } from '../services/bible.js'
+import type { User } from '@supabase/supabase-js'
+import { supabaseAdmin } from '../lib/supabaseAdmin.js'
 
 const devotionsRouter = Router()
 
-const devotionColumns = [
-  'id',
-  'user_id',
-  'author_name',
-  'book',
-  'chapter',
-  'verse_start',
-  'verse_end',
-  'reflection',
-  'created_at',
-  'devotion_date',
-].join(', ')
+const devotionColumns =
+  'id, user_id, author_name, book, chapter, verse_start, verse_end, reflection, created_at, devotion_date' as const
 
 // Menghasilkan tanggal YYYY-MM-DD berdasarkan WIB.
 function getTodayWIB() {
@@ -40,6 +33,30 @@ devotionsRouter.use((_req, res, next) => {
 
 devotionsRouter.use(requireAuth)
 
+// GET /api/devotions/streak
+devotionsRouter.get('/streak', async (_req, res) => {
+  const accessToken = res.locals.accessToken as string
+  const userClient = createUserClient(accessToken)
+
+  try {
+    const { data, error } = await userClient
+      .rpc('get_my_devotion_streak')
+      .single()
+
+    if (error) throw error
+
+    if (!data) {
+      throw new Error('Data streak tidak tersedia.')
+    }
+
+    res.json({ data })
+  } catch {
+    res.status(500).json({
+      message: 'Streak belum berhasil dimuat. Coba lagi sebentar.',
+    })
+  }
+})
+
 // GET /api/devotions
 devotionsRouter.get('/', async (_req, res) => {
   const accessToken = res.locals.accessToken as string
@@ -57,8 +74,29 @@ devotionsRouter.get('/', async (_req, res) => {
 
     if (error) throw error
 
+    const { data: authors, error: avatarsError } = await userClient
+      .rpc('get_today_devotion_avatars')
+
+    if (avatarsError) throw avatarsError
+
+    type AuthorAvatar = {
+      user_id: string
+      avatar_path: string | null
+    }
+
+    const avatarByUser = new Map<string, string | null>()
+
+    for (const author of (authors ?? []) as AuthorAvatar[]) {
+      avatarByUser.set(author.user_id, author.avatar_path)
+    }
+
+    const devotionsWithAvatars = (data ?? []).map((devotion) => ({
+      ...devotion,
+      avatar_path: avatarByUser.get(devotion.user_id) ?? null,
+    }))
+
     res.json({
-      data,
+      data: devotionsWithAvatars,
       date: today,
     })
   } catch {
@@ -70,7 +108,7 @@ devotionsRouter.get('/', async (_req, res) => {
 
 // POST /api/devotions
 devotionsRouter.post('/', async (req, res) => {
-  const accessToken = res.locals.accessToken as string
+  const user = res.locals.authUser as User
 
   const book: unknown = req.body?.book
   const chapter: unknown = req.body?.chapter
@@ -147,16 +185,27 @@ devotionsRouter.post('/', async (req, res) => {
     return
   }
 
-  const userClient = createUserClient(accessToken)
-
   try {
-    const { data, error } = await userClient
+    // Periksa referensi langsung dari sumber Alkitab.
+    const passage = await findBiblePassage({
+      book: cleanBook,
+      chapter,
+      verse_start: verseStart,
+      verse_end: cleanVerseEnd ?? verseStart,
+    })
+
+    // Simpan hanya setelah referensinya berhasil diperiksa.
+    const { data, error } = await supabaseAdmin
       .from('devotions')
       .insert({
-        book: cleanBook,
-        chapter,
-        verse_start: verseStart,
-        verse_end: cleanVerseEnd,
+        user_id: user.id,
+        book: passage.book,
+        chapter: passage.chapter,
+        verse_start: passage.verse_start,
+        verse_end:
+          passage.verse_end === passage.verse_start
+            ? null
+            : passage.verse_end,
         reflection: cleanReflection,
       })
       .select(devotionColumns)
@@ -168,7 +217,15 @@ devotionsRouter.post('/', async (req, res) => {
       message: 'Renungan berhasil dibagikan.',
       data,
     })
-  } catch {
+
+  } catch (error) {
+    if (error instanceof BibleError) {
+      res.status(error.status).json({
+        message: error.message,
+      })
+      return
+    }
+
     res.status(500).json({
       message: 'Renungan belum berhasil disimpan. Coba lagi sebentar.',
     })

@@ -17,6 +17,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import DevotionPage from './pages/DevotionPage'
 import ProtectedRoute from './components/ProtectedRoute'
+import StreakButton from './components/StreakButton'
 import './community-pages.css'
 
 import './App.css'
@@ -78,6 +79,7 @@ function App() {
               }
             />
           </Routes>
+          <StreakButton />
         </BrowserRouter>
       </ProfileProvider>
     </AuthProvider>

@@ -32,7 +32,7 @@
   );
 
   background-size: 96px 96px;
-  animation: community-pattern-drift 14s linear infinite;
+  animation: community-pattern-drift 7s linear infinite;
 }
 
 /* Events page: grid kuning butter. */
@@ -54,7 +54,7 @@
     );
 
   background-size: 64px 64px;
-  animation: events-pattern-drift 12s linear infinite;
+  animation: events-pattern-drift 7s linear infinite;
 }
 
 @keyframes community-pattern-drift {
@@ -469,4 +469,115 @@
   .devotion-entry {
     animation: none;
   }
+}
+
+.devotion-author {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.profile-avatar.devotion-author-avatar {
+  box-sizing: border-box;
+  width: 42px;
+  height: 42px;
+  border: 2px solid #38251c;
+  border-radius: 50%;
+  background: #ffd08a;
+  color: #38251c;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.devotion-author-info {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.devotion-author-info strong {
+  line-height: 1.35;
+}
+
+.bible-preview {
+  min-width: 0;
+  padding: 1rem 1.1rem;
+  border: 1px solid #dfb38d;
+  border-left: 4px solid #a94727;
+  border-radius: 4px 14px 14px 4px;
+  background: #fff0d9;
+  color: #38251c;
+}
+
+.bible-preview-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.bible-preview-heading strong {
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+.bible-version {
+  padding: 0.2rem 0.5rem;
+  border: 1px solid #bf967b;
+  border-radius: 6px;
+  background: #fffaf0;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.bible-preview-verses {
+  max-height: 260px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.bible-preview-verses p {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.bible-preview-verses p:last-child {
+  margin-bottom: 0;
+}
+
+.bible-preview-verses sup {
+  color: #a94727;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.bible-preview-source {
+  display: inline-block;
+  margin-top: 0.85rem;
+  color: #806758;
+  font-size: 0.7rem;
+  line-height: 1.5;
+  text-underline-offset: 3px;
+}
+
+.bible-preview-status {
+  color: #806758;
+  font-size: 0.85rem;
+}
+
+.bible-preview-error {
+  background: #fff0e9;
+}
+
+.bible-preview-error p {
+  margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
 }

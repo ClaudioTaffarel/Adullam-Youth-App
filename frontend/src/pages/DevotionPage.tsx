@@ -5,6 +5,8 @@ import {
   publishDevotion,
 } from '../services/devotions'
 import type { Devotion } from '../services/devotions'
+import Avatar from '../components/Avatar'
+import BiblePassagePreview from '../components/BiblePassagePreview'
 
 // WIB adalah UTC+7.
 function millisecondsUntilMidnightWIB() {
@@ -166,6 +168,8 @@ function DevotionPage() {
         reflection: cleanReflection,
       })
 
+      window.dispatchEvent(new Event('devotion-published'))
+      
       setBook('')
       setChapter('')
       setVerses('')
@@ -244,6 +248,12 @@ function DevotionPage() {
                 </div>
               </div>
 
+              <BiblePassagePreview
+                book={book}
+                chapter={chapter}
+                verses={verses}
+              />
+              
               <div className="devotion-field">
                 <label htmlFor="devotion-reflection">
                   Renungan kamu
@@ -327,11 +337,21 @@ function DevotionPage() {
             {devotions.map((devotion) => (
               <article className="devotion-entry" key={devotion.id}>
                 <header className="devotion-entry-header">
-                  <strong>{devotion.author_name}</strong>
+                  <div className="devotion-author">
+                    <Avatar
+                      path={devotion.avatar_path ?? null}
+                      name={devotion.author_name}
+                      className="devotion-author-avatar"
+                    />
 
-                  <time dateTime={devotion.created_at}>
-                    {formatTime(devotion.created_at)} WIB
-                  </time>
+                    <div className="devotion-author-info">
+                      <strong>{devotion.author_name}</strong>
+
+                      <time dateTime={devotion.created_at}>
+                        {formatTime(devotion.created_at)} WIB
+                      </time>
+                    </div>
+                  </div>
                 </header>
 
                 <h3>

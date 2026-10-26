@@ -118,82 +118,84 @@ function Navbar() {
         </NavLink>
       </nav>
 
-      {isChecking ? (
-        <span className="nav-account-loading" role="status">
-          Memuat akun...
-        </span>
-      ) : session ? (
-        <details
-          className="account-dropdown"
-          ref={menuRef}
-          key={session.user.id}
-        >
-          <summary
-            className="account-entry"
-            aria-label={`Pilihan akun ${name}`}
-          >
-            <Avatar
-              path={profile?.avatar_path ?? null}
-              name={name}
-              className="nav-avatar"
-            />
-
-            <span className="account-entry-copy">
-              <strong>{firstName}</strong>
+      <div className="nav-member-actions">
+          {isChecking ? (
+            <span className="nav-account-loading" role="status">
+              Memuat akun...
             </span>
-
-            <span className="account-chevron" aria-hidden="true">
-              ▾
-            </span>
-          </summary>
-
-          <div className="account-dropdown-panel">
-            <p className="account-dropdown-heading">
-              Halo, {firstName}!
-            </p>
-
-            <Link
-              className="account-dropdown-item"
-              to="/login"
-              onClick={closeMenu}
+          ) : session ? (
+            <details
+              className="account-dropdown"
+              ref={menuRef}
+              key={session.user.id}
             >
-              Akun Saya <span aria-hidden="true">↗</span>
+              <summary
+                className="account-entry"
+                aria-label={`Pilihan akun ${name}`}
+              >
+                <Avatar
+                  path={profile?.avatar_path ?? null}
+                  name={name}
+                  className="nav-avatar"
+                />
+
+                <span className="account-entry-copy">
+                  <strong>{firstName}</strong>
+                </span>
+
+                <span className="account-chevron" aria-hidden="true">
+                  ▾
+                </span>
+              </summary>
+
+              <div className="account-dropdown-panel">
+                <p className="account-dropdown-heading">
+                  Halo, {firstName}!
+                </p>
+
+                <Link
+                  className="account-dropdown-item"
+                  to="/login"
+                  onClick={closeMenu}
+                >
+                  Akun Saya <span aria-hidden="true">↗</span>
+                </Link>
+
+                <button
+                  type="button"
+                  className="account-dropdown-item account-logout"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                >
+                  {isLoggingOut ? 'Sedang keluar...' : 'Logout'}
+                </button>
+
+                {logoutError && (
+                  <p className="account-dropdown-error" role="alert">
+                    {logoutError}
+                  </p>
+                )}
+              </div>
+            </details>
+          ) : (
+            <Link className="account-entry" to="/login">
+              <span className="account-entry-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="8" r="3.5" />
+                  <path d="M5 21V19A7 7 0 0 1 19 19V21" />
+                </svg>
+              </span>
+
+              <span className="account-entry-copy">
+                <strong>Masuk / Daftar</strong>
+              </span>
+
+              <span className="account-entry-arrow" aria-hidden="true">
+                ↗
+              </span>
             </Link>
-
-            <button
-              type="button"
-              className="account-dropdown-item account-logout"
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-            >
-              {isLoggingOut ? 'Sedang keluar...' : 'Logout'}
-            </button>
-
-            {logoutError && (
-              <p className="account-dropdown-error" role="alert">
-                {logoutError}
-              </p>
-            )}
-          </div>
-        </details>
-      ) : (
-        <Link className="account-entry" to="/login">
-          <span className="account-entry-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="8" r="3.5" />
-              <path d="M5 21V19A7 7 0 0 1 19 19V21" />
-            </svg>
-          </span>
-
-          <span className="account-entry-copy">
-            <strong>Masuk / Daftar</strong>
-          </span>
-
-          <span className="account-entry-arrow" aria-hidden="true">
-            ↗
-          </span>
-        </Link>
-      )}
+          )}
+      </div>
     </header>
   )
 }
