@@ -7,6 +7,7 @@ import { requireAuth } from './middleware/requireAuth.js'
 import profileRouter from './routes/profile.js'
 import devotionsRouter from './routes/devotions.js'
 import bibleRouter from './routes/bible.js'
+import adminRouter from './routes/admin.js'
 
 const app = express()
 const port = Number(process.env.PORT ?? 3000)
@@ -21,6 +22,7 @@ app.use(express.json())
 app.use('/api/profile', profileRouter)
 app.use('/api/devotions', devotionsRouter)
 app.use('/api/bible', bibleRouter)
+app.use('/api/admin', adminRouter)
 
 // Mengecek apakah server Express hidup.
 // Ini belum memeriksa koneksi database.

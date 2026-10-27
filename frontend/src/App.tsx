@@ -19,6 +19,9 @@ import DevotionPage from './pages/DevotionPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import StreakButton from './components/StreakButton'
 import './community-pages.css'
+import AdminRoute from './components/AdminRoute'
+import AdminPage from './pages/AdminPage'
+import './admin.css'
 
 import './App.css'
 import './auth.css'
@@ -64,6 +67,15 @@ function App() {
               }
             />
 
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <AdminPage />
+                </AdminRoute>
+              }
+            />
+            
             <Route
               path="*"
               element={
