@@ -4,12 +4,48 @@ import MemoryHero from '../components/MemoryHero'
 import EventsSection from '../components/EventsSection'
 import DailyVerse from '../components/DailyVerse'
 import AboutDoodle from '../components/AboutDoodle'
+import { useEffect, useState } from 'react'
+import {
+  defaultWebsitePhotos,
+  getWebsitePhotos,
+} from '../services/website-photos'
 
 function HomePage() {
+  const [photos, setPhotos] = useState(defaultWebsitePhotos)
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    const timeoutId = window.setTimeout(() => {
+      controller.abort()
+    }, 15_000)
+
+    async function loadPhotos() {
+      try {
+        const result = await getWebsitePhotos(controller.signal)
+
+        if (!controller.signal.aborted) {
+          setPhotos(result)
+        }
+      } catch {
+        // Tetap tampilkan foto default jika API tidak tersedia.
+      } finally {
+        window.clearTimeout(timeoutId)
+      }
+    }
+
+    void loadPhotos()
+
+    return () => {
+      window.clearTimeout(timeoutId)
+      controller.abort()
+    }
+  }, [])
+
   const pageRef = useScrollReveal<HTMLElement>()
   return (
     <main ref={pageRef} data-reveal-scope>
-      <MemoryHero />
+      <MemoryHero photos={photos} />
 
       <CommunityMarquee />
 
@@ -28,7 +64,8 @@ function HomePage() {
             </span>
 
             <img
-              src="/images/memories/1.webp"
+              key={photos.about}
+              src={photos.about}
               alt="Kebersamaan anggota ADULLAM Youth"
               loading="lazy"
               onError={(event) => {

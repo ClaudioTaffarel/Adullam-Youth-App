@@ -1454,6 +1454,8 @@
   line-height: 1.9;
   white-space: pre-line;
   overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .event-modal-signature {

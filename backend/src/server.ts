@@ -8,6 +8,10 @@ import profileRouter from './routes/profile.js'
 import devotionsRouter from './routes/devotions.js'
 import bibleRouter from './routes/bible.js'
 import adminRouter from './routes/admin.js'
+import {
+  websitePhotosRouter,
+  adminWebsitePhotosRouter,
+} from './routes/website-photos.js'
 
 const app = express()
 const port = Number(process.env.PORT ?? 3000)
@@ -22,6 +26,8 @@ app.use(express.json())
 app.use('/api/profile', profileRouter)
 app.use('/api/devotions', devotionsRouter)
 app.use('/api/bible', bibleRouter)
+app.use('/api/website-photos', websitePhotosRouter)
+app.use('/api/admin/website-photos', adminWebsitePhotosRouter)
 app.use('/api/admin', adminRouter)
 
 // Mengecek apakah server Express hidup.
@@ -36,11 +42,13 @@ app.get('/api/health', (_req, res) => {
 // Mengambil kegiatan yang sudah dipublikasikan.
 app.get('/api/events', async (_req, res) => {
   try {
+    res.setHeader('Cache-Control', 'no-store')
     const { data, error } = await supabase
       .from('events')
       .select('id, title, category, image, description')
       .eq('is_published', true)
-      .order('id', { ascending: true })
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
 
     if (error) {
       console.error('Supabase gagal membaca events:', error.message)

@@ -1,4 +1,9 @@
 import type { CSSProperties } from 'react'
+import {
+  defaultWebsitePhotos,
+  websitePhotoSlots,
+} from '../services/website-photos'
+import type { WebsitePhotos } from '../services/website-photos'
 
 const memories = [
   { file: '1.webp', caption: 'Little moments, big memories.' },
@@ -9,7 +14,13 @@ const memories = [
   { file: '6.webp', caption: 'These are the good days.' },
 ]
 
-function MemoryHero() {
+type MemoryHeroProps = {
+  photos?: WebsitePhotos
+}
+
+function MemoryHero({
+  photos = defaultWebsitePhotos,
+}: MemoryHeroProps) {
   return (
     <section className="memory-hero" id="home">
       <div className="wind-background" aria-hidden="true">
@@ -73,6 +84,9 @@ function MemoryHero() {
           </span>
 
           {memories.map((memory, index) => {
+            const slot = websitePhotoSlots[index]
+            const imageUrl = slot ? photos[slot] : `/images/memories/${memory.file}`
+            
             const style = {
               '--delay': `${index * -3}s`,
               '--tilt': `${[-12, 8, -6, 11, -9, 5][index]}deg`,
@@ -89,7 +103,8 @@ function MemoryHero() {
                   <span className="photo-placeholder">ADULLAM MEMORIES</span>
 
                   <img
-                    src={`/images/memories/${memory.file}`}
+                    key={imageUrl}
+                    src={imageUrl}
                     alt=""
                     onError={(event) => {
                       event.currentTarget.style.display = 'none'
