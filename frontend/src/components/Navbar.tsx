@@ -1,54 +1,88 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router'
+
 import { useAuth } from '../context/auth-context'
 import { useProfile } from '../context/profile-context'
 import Avatar from './Avatar'
+import './Navbar.css'
 
 function Navbar() {
   const { session, isChecking, logout } = useAuth()
   const { profile } = useProfile()
 
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
-  const [logoutError, setLogoutError] = useState<string | null>(null)
-
-  const menuRef = useRef<HTMLDetailsElement>(null)
   const location = useLocation()
   const navigate = useNavigate()
 
-  const name = profile?.display_name.trim() || 'Teman'
+  const headerRef = useRef<HTMLElement>(null)
+  const toggleRef = useRef<HTMLButtonElement>(null)
+  const accountRef = useRef<HTMLDetailsElement>(null)
+
+  const [openedFor, setOpenedFor] = useState<string | null>(null)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [logoutError, setLogoutError] = useState<string | null>(null)
+
+  // Saat route berubah, menu otomatis dianggap tertutup.
+  const mobileOpen = openedFor === location.key
+
+  const name = profile?.display_name?.trim() || 'Teman'
   const firstName = name.split(/\s+/)[0]
 
-  function closeMenu() {
-    if (menuRef.current) {
-      menuRef.current.open = false
+  function closeAccount() {
+    if (accountRef.current) {
+      accountRef.current.open = false
     }
   }
 
+  function closeMenus() {
+    setOpenedFor(null)
+    closeAccount()
+  }
+
+  function toggleMenu() {
+    closeAccount()
+    setOpenedFor(mobileOpen ? null : location.key)
+  }
+
   useEffect(() => {
-    if (menuRef.current) {
-      menuRef.current.open = false
+    if (accountRef.current) {
+      accountRef.current.open = false
     }
-  }, [location.pathname, location.hash])
+  }, [location.key])
 
   useEffect(() => {
     function handleOutsideClick(event: PointerEvent) {
-      const menu = menuRef.current
+      if (!(event.target instanceof Node)) return
+
+      const account = accountRef.current
+
+      if (account && !account.contains(event.target)) {
+        account.open = false
+      }
 
       if (
-        menu &&
-        event.target instanceof Node &&
-        !menu.contains(event.target)
+        mobileOpen &&
+        headerRef.current &&
+        !headerRef.current.contains(event.target)
       ) {
-        menu.open = false
+        setOpenedFor(null)
       }
     }
 
     function handleEscape(event: KeyboardEvent) {
-      const menu = menuRef.current
+      if (event.key !== 'Escape') return
 
-      if (event.key === 'Escape' && menu?.open) {
-        menu.open = false
-        menu.querySelector('summary')?.focus()
+      const account = accountRef.current
+
+      // Tutup dropdown akun dahulu jika sedang terbuka.
+      if (account?.open) {
+        account.open = false
+        account.querySelector('summary')?.focus()
+        return
+      }
+
+      if (mobileOpen) {
+        setOpenedFor(null)
+        toggleRef.current?.focus()
       }
     }
 
@@ -58,6 +92,41 @@ function Navbar() {
     return () => {
       document.removeEventListener('pointerdown', handleOutsideClick)
       document.removeEventListener('keydown', handleEscape)
+    }
+  }, [mobileOpen])
+
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 1025px)')
+
+    function handleResize() {
+      setOpenedFor(null)
+
+      if (accountRef.current) {
+        accountRef.current.open = false
+      }
+
+      // Jangan tinggalkan fokus pada elemen yang baru disembunyikan.
+      const focused = document.activeElement
+
+      if (desktop.matches && focused === toggleRef.current) {
+        headerRef.current
+          ?.querySelector<HTMLAnchorElement>('.brand')
+          ?.focus()
+      } else if (
+        !desktop.matches &&
+        focused instanceof Element &&
+        headerRef.current
+          ?.querySelector('.youth-menu')
+          ?.contains(focused)
+      ) {
+        toggleRef.current?.focus()
+      }
+    }
+
+    desktop.addEventListener('change', handleResize)
+
+    return () => {
+      desktop.removeEventListener('change', handleResize)
     }
   }, [])
 
@@ -69,7 +138,7 @@ function Navbar() {
 
     try {
       await logout()
-      closeMenu()
+      closeMenus()
       navigate('/login')
     } catch {
       setLogoutError('Belum berhasil keluar. Coba lagi, ya.')
@@ -78,47 +147,106 @@ function Navbar() {
     }
   }
 
+  const isAbout =
+    location.pathname === '/' && location.hash === '#about'
+
   return (
-    <header className="site-header">
-      <Link className="brand" to="/" aria-label="Adullam Youth Home">
+    <header
+      ref={headerRef}
+      className="site-header youth-header"
+      onBlur={(event) => {
+        const nextTarget = event.relatedTarget
+
+        if (
+          nextTarget instanceof Node &&
+          !event.currentTarget.contains(nextTarget)
+        ) {
+          closeMenus()
+        }
+      }}
+    >
+      <Link
+        className="brand"
+        to="/"
+        aria-label="Adullam Youth Home"
+        onClick={closeMenus}
+      >
         ADULLAM<span>YOUTH.</span>
       </Link>
 
-      <nav className="navigation" aria-label="Navigasi utama">
-        <NavLink
-          to="/"
-          end
-          className={({ isActive }) =>
-            `nav-link ${isActive ? 'active' : ''}`
-          }
-        >
-          Home
-        </NavLink>
+      <button
+        ref={toggleRef}
+        type="button"
+        className={`youth-menu-toggle ${mobileOpen ? 'is-open' : ''}`}
+        onClick={toggleMenu}
+        aria-label={mobileOpen ? 'Tutup navigasi' : 'Buka navigasi'}
+        aria-expanded={mobileOpen}
+        aria-controls="youth-navigation-panel"
+      >
+        <span className="youth-toggle-label" aria-hidden="true">
+          {mobileOpen ? 'Tutup' : 'Menu'}
+        </span>
 
-        <Link className="nav-link" to="/#about">
-          About Us
-        </Link>
+        <span className="youth-toggle-lines" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </span>
+      </button>
 
-        <NavLink
-          to="/events"
-          className={({ isActive }) =>
-            `nav-link ${isActive ? 'active' : ''}`
-          }
-        >
-          Events
-        </NavLink>
+      <div
+        id="youth-navigation-panel"
+        className={`youth-menu ${mobileOpen ? 'is-open' : ''}`}
+      >
+        <p className="youth-mobile-note">YOUR LITTLE HOME</p>
 
-        <NavLink
-          to="/devotion"
-          className={({ isActive }) =>
-            `nav-link ${isActive ? 'active' : ''}`
-          }
-        >
-          Devotion
-        </NavLink>
-      </nav>
+        <nav className="navigation" aria-label="Navigasi utama">
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) =>
+              `nav-link ${isActive && !isAbout ? 'active' : ''}`
+            }
+            onClick={closeMenus}
+          >
+            <span className="youth-link-number" aria-hidden="true">01</span>
+            Home
+          </NavLink>
 
-      <div className="nav-member-actions">
+          <Link
+            className={`nav-link ${isAbout ? 'active' : ''}`}
+            to="/#about"
+            aria-current={isAbout ? 'location' : undefined}
+            onClick={closeMenus}
+          >
+            <span className="youth-link-number" aria-hidden="true">02</span>
+            About Us
+          </Link>
+
+          <NavLink
+            to="/events"
+            className={({ isActive }) =>
+              `nav-link ${isActive ? 'active' : ''}`
+            }
+            onClick={closeMenus}
+          >
+            <span className="youth-link-number" aria-hidden="true">03</span>
+            Events
+          </NavLink>
+
+          <NavLink
+            to="/devotion"
+            className={({ isActive }) =>
+              `nav-link ${isActive ? 'active' : ''}`
+            }
+            onClick={closeMenus}
+          >
+            <span className="youth-link-number" aria-hidden="true">04</span>
+            Devotion
+          </NavLink>
+        </nav>
+
+        <div className="nav-member-actions">
           {isChecking ? (
             <span className="nav-account-loading" role="status">
               Memuat akun...
@@ -126,7 +254,7 @@ function Navbar() {
           ) : session ? (
             <details
               className="account-dropdown"
-              ref={menuRef}
+              ref={accountRef}
               key={session.user.id}
             >
               <summary
@@ -156,9 +284,9 @@ function Navbar() {
                 <Link
                   className="account-dropdown-item"
                   to="/login"
-                  onClick={closeMenu}
+                  onClick={closeMenus}
                 >
-                  Akun Saya <span aria-hidden="true">↗</span>
+                  Akun Saya
                 </Link>
 
                 <button
@@ -178,7 +306,11 @@ function Navbar() {
               </div>
             </details>
           ) : (
-            <Link className="account-entry" to="/login">
+            <Link
+              className="account-entry"
+              to="/login"
+              onClick={closeMenus}
+            >
               <span className="account-entry-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none">
                   <circle cx="12" cy="8" r="3.5" />
@@ -189,12 +321,11 @@ function Navbar() {
               <span className="account-entry-copy">
                 <strong>Masuk / Daftar</strong>
               </span>
-
-              <span className="account-entry-arrow" aria-hidden="true">
-                ↗
-              </span>
             </Link>
           )}
+        </div>
+
+        <p className="youth-mobile-signature">#SemuaOrangDiterima</p>
       </div>
     </header>
   )
