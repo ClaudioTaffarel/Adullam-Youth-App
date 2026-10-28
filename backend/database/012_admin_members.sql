@@ -30,6 +30,7 @@ begin
       u.email::text as email,
       p.phone_number,
       coalesce(r.role, 'member') as role,
+      (u.banned_until is null or u.banned_until <= now()) as is_active,
       u.created_at
     from auth.users as u
     left join public.profiles as p

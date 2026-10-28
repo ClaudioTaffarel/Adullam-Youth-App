@@ -1724,3 +1724,26 @@
     padding: 22px;
   }
 }
+
+.ay-member-status-actions {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--admin-line);
+}
+
+.ay-member-status-help {
+  margin: 20px 0 0;
+  color: var(--admin-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.ay-member-cell div > .ay-member-inactive {
+  justify-self: start;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #fbe4da;
+  color: #9e3926;
+  font-size: 10px;
+  font-weight: 750;
+}

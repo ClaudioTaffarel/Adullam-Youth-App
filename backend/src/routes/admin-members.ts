@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { requireAuth } from '../middleware/requireAuth.js'
 import { requireAdmin } from '../middleware/requireAdmin.js'
 import { supabaseAdmin } from '../lib/supabaseAdmin.js'
+import type { User } from '@supabase/supabase-js'
 
 const adminMembersRouter = Router()
 
@@ -58,6 +59,86 @@ adminMembersRouter.get('/', async (req, res) => {
 
     res.status(500).json({
       message: 'Daftar anggota belum berhasil dimuat. Coba lagi sebentar.',
+    })
+  }
+})
+
+// PATCH /api/admin/members/:id/status
+adminMembersRouter.patch('/:id/status', async (req, res) => {
+  const id = req.params.id
+  const isActive: unknown = req.body?.is_active
+  const currentUser = res.locals.authUser as User
+
+  if (
+    typeof id !== 'string' ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) ||
+    typeof isActive !== 'boolean'
+  ) {
+    res.status(400).json({
+      message: 'ID atau status akun tidak valid.',
+    })
+    return
+  }
+
+  if (id.toLowerCase() === currentUser.id.toLowerCase()) {
+    res.status(400).json({
+      message: 'Kamu tidak bisa mengubah status akun sendiri.',
+    })
+    return
+  }
+
+  try {
+    const { data: role, error: roleError } = await supabaseAdmin
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', id)
+      .maybeSingle()
+
+    if (roleError) throw roleError
+
+    // Pengelolaan status di halaman Members hanya untuk akun member.
+    if (role?.role === 'admin') {
+      res.status(403).json({
+        message: 'Status akun admin tidak bisa diubah dari menu Members.',
+      })
+      return
+    }
+
+    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(
+      id,
+      {
+        ban_duration: isActive ? 'none' : '876000h',
+      },
+    )
+
+    if (error) {
+      if (error.status === 404 || error.code === 'user_not_found') {
+        res.status(404).json({
+          message: 'Akun tidak ditemukan.',
+        })
+        return
+      }
+
+      throw error
+    }
+
+    if (!data.user) throw new Error('Respons akun tidak tersedia.')
+
+    res.json({
+      message: isActive
+        ? 'Akun berhasil diaktifkan kembali.'
+        : 'Akun berhasil dinonaktifkan.',
+      data: {
+        id: data.user.id,
+        is_active: isActive,
+      },
+    })
+  } catch (error) {
+    console.error('Gagal mengubah status anggota:', error)
+
+    res.status(500).json({
+      message:
+        'Status akun belum dapat dipastikan berubah. Perbarui daftar sebelum mencoba lagi.',
     })
   }
 })

@@ -7,6 +7,7 @@ import type {
   AdminMember,
   AdminMembersResponse,
 } from '../services/admin-members'
+import MemberStatusButton from '../components/MemberStatusButton'
 
 const dateFormatter = new Intl.DateTimeFormat('id-ID', {
   timeZone: 'Asia/Jakarta',
@@ -22,9 +23,11 @@ function formatDate(value: string) {
 function MemberDetail({
   member,
   onClose,
+  onChanged,
 }: {
   member: AdminMember
   onClose: () => void
+  onChanged: () => void
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null)
 
@@ -99,6 +102,11 @@ function MemberDetail({
 
         <dl className="ay-member-details">
           <div>
+            <dt>Status akun</dt>
+            <dd>{member.is_active ? 'Aktif' : 'Nonaktif'}</dd>
+          </div>
+
+          <div>
             <dt>Email</dt>
             <dd>{member.email || 'Belum tersedia'}</dd>
           </div>
@@ -122,6 +130,7 @@ function MemberDetail({
             <dd className="ay-member-id">{member.id}</dd>
           </div>
         </dl>
+        <MemberStatusButton member={member} onChanged={onChanged} />
       </div>
     </dialog>
   )
@@ -357,6 +366,9 @@ function MembersContent() {
                               {member.email || 'Email belum tersedia'}
                             </span>
                           </div>
+                          {!member.is_active && (
+                            <span className="ay-member-inactive">Nonaktif</span>
+                          )}
                         </div>
                       </td>
 
@@ -440,6 +452,10 @@ function MembersContent() {
           key={selectedMember.id}
           member={selectedMember}
           onClose={() => setSelectedMember(null)}
+          onChanged={() => {
+            setSelectedMember(null)
+            setReloadKey((value) => value + 1)
+          }}
         />
       )}
     </>

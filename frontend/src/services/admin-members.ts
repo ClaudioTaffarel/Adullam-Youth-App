@@ -6,6 +6,7 @@ export type AdminMember = {
   email: string | null
   phone_number: string | null
   role: 'member' | 'admin'
+  is_active: boolean
   created_at: string
 }
 
@@ -35,6 +36,7 @@ function isMember(value: unknown): value is AdminMember {
   if (!isRecord(value)) return false
 
   return (
+    typeof value.is_active === 'boolean' &&
     typeof value.id === 'string' &&
     typeof value.display_name === 'string' &&
     (value.email === null || typeof value.email === 'string') &&
@@ -43,6 +45,7 @@ function isMember(value: unknown): value is AdminMember {
     (value.role === 'member' || value.role === 'admin') &&
     typeof value.created_at === 'string' &&
     Number.isFinite(Date.parse(value.created_at))
+    
   )
 }
 
@@ -129,5 +132,63 @@ export async function getAdminMembers({
       total: pagination.total,
       total_pages: pagination.total_pages,
     },
+  }
+}
+
+export async function setAdminMemberStatus(
+  id: string,
+  isActive: boolean,
+): Promise<void> {
+  const apiUrl = import.meta.env.VITE_API_URL?.replace(/\/+$/, '')
+
+  if (!apiUrl) {
+    throw new Error('Alamat backend belum dikonfigurasi.')
+  }
+
+  const { data, error } = await supabase.auth.getSession()
+
+  if (error) throw error
+
+  if (!data.session) {
+    throw new Error('Sesi login berakhir. Silakan masuk kembali.')
+  }
+
+  let response: Response
+
+  try {
+    response = await fetch(`${apiUrl}/api/admin/members/${id}/status`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${data.session.access_token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ is_active: isActive }),
+      signal: AbortSignal.timeout(20_000),
+    })
+  } catch {
+    throw new Error(
+      'Respons belum diterima. Tutup popup dan perbarui daftar untuk memeriksa status akun.',
+    )
+  }
+
+  const payload: unknown = await response.json().catch(() => null)
+
+  if (!response.ok) {
+    throw new Error(
+      isRecord(payload) && typeof payload.message === 'string'
+        ? payload.message
+        : 'Status akun belum berhasil diubah.',
+    )
+  }
+
+  if (
+    !isRecord(payload) ||
+    !isRecord(payload.data) ||
+    payload.data.id !== id ||
+    payload.data.is_active !== isActive
+  ) {
+    throw new Error(
+      'Respons tidak lengkap. Perbarui daftar untuk memeriksa status akun.',
+    )
   }
 }
