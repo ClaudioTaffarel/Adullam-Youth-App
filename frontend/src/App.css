@@ -1923,3 +1923,119 @@
     animation: none;
   }
 }
+
+/* ===== COMPACT CONTACT FOOTER ===== */
+
+.compact-contact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 6%;
+  border-top: 2px solid #713019;
+  background: #a84422;
+  color: #fff;
+}
+
+.compact-contact-copy {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+.compact-contact-brand {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+
+.compact-contact-brand > a {
+  color: #fff;
+  font-size: 19px;
+  font-weight: 850;
+  line-height: 1.1;
+  letter-spacing: -0.7px;
+  text-decoration: none;
+}
+
+.compact-contact-brand > span {
+  color: #fff;
+  font-size: 11px;
+}
+
+.compact-contact-copy > p {
+  max-width: 540px;
+  margin: 0;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.compact-contact-links {
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+.compact-contact-links a {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 60%);
+  border-radius: 12px;
+  background: transparent;
+  color: #fff;
+  text-decoration: none;
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.compact-contact-links svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.compact-contact-links a:first-child svg {
+  stroke: none;
+}
+
+.compact-contact-links a:hover {
+  border-color: #fff;
+  background: #fff;
+  color: #a84422;
+  box-shadow: 3px 3px 0 #713019;
+}
+
+.compact-contact a:focus-visible {
+  outline: 3px solid #ffda65;
+  outline-offset: 4px;
+}
+
+@media (max-width: 600px) {
+  .compact-contact {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+    padding-block: 20px;
+  }
+
+  .compact-contact-brand {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compact-contact-links a {
+    transition: none;
+  }
+}

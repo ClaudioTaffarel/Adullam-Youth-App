@@ -9,6 +9,7 @@ import {
   defaultWebsitePhotos,
   getWebsitePhotos,
 } from '../services/website-photos'
+import ContactSection from '../components/ContactSection'
 
 function HomePage() {
   const [photos, setPhotos] = useState(defaultWebsitePhotos)
@@ -96,13 +97,22 @@ function HomePage() {
             <span className="meeting-label">
               <i aria-hidden="true" /> SEE YOU THIS THURSDAY
             </span>
-            <strong>Kamis / 19.00–21.00 WIB</strong>
+            <strong>Kamis / 19.00-21.00 WIB</strong>
+            <p>
+              Ruang Belakang Teens, LT. 2,
+              <br />
+              RKD Transformation School
+            </p>
             <p>Prayer night sebulan sekali.</p>
           </div>
         </div>
       </section>
 
       <EventsSection />
+
+      <div data-reveal>
+        <ContactSection />
+      </div>
     </main>
   )
 }
