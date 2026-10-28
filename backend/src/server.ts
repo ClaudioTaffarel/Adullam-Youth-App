@@ -13,6 +13,7 @@ import {
   adminWebsitePhotosRouter,
 } from './routes/website-photos.js'
 import adminMembersRouter from './routes/admin-members.js'
+import adminDevotionsRouter from './routes/admin-devotions.js'
 
 const app = express()
 const port = Number(process.env.PORT ?? 3000)
@@ -28,6 +29,7 @@ app.use('/api/profile', profileRouter)
 app.use('/api/devotions', devotionsRouter)
 app.use('/api/bible', bibleRouter)
 app.use('/api/website-photos', websitePhotosRouter)
+app.use('/api/admin/devotions', adminDevotionsRouter)
 app.use('/api/admin/website-photos', adminWebsitePhotosRouter)
 app.use('/api/admin/members', adminMembersRouter)
 app.use('/api/admin', adminRouter)

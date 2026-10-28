@@ -29,6 +29,7 @@ import AdminEventCreatePage from './pages/AdminEventCreatePage'
 import AdminEventEditPage from './pages/AdminEventEditPage'
 import AdminWebsitePhotosPage from './pages/AdminWebsitePhotosPage'
 import AdminMembersPage from './pages/AdminMembersPage'
+import AdminDevotionsPage from './pages/AdminDevotionsPage'
 
 import './App.css'
 import './auth.css'
@@ -124,15 +125,7 @@ function App() {
               
               <Route path="members" element={<AdminMembersPage />} />
 
-              <Route
-                path="devotions"
-                element={
-                  <AdminModulePage
-                    title="Devotions"
-                    description="Daftar renungan dan pengelolaan konten komunitas akan tersedia di sini."
-                  />
-                }
-              />
+              <Route path="devotions" element={<AdminDevotionsPage />} />
 
               <Route path="events" element={<AdminEventsPage />} />
               <Route path="events/new" element={<AdminEventCreatePage />} />

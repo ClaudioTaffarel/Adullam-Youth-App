@@ -68,6 +68,7 @@ devotionsRouter.get('/', async (_req, res) => {
       .from('devotions')
       .select(devotionColumns)
       .eq('devotion_date', today)
+      .eq('is_hidden', false)
       .order('created_at', { ascending: false })
       .order('id', { ascending: false })
       .limit(100)
