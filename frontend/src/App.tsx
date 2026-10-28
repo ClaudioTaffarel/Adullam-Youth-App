@@ -28,6 +28,7 @@ import AdminEventsPage from './pages/AdminEventsPage'
 import AdminEventCreatePage from './pages/AdminEventCreatePage'
 import AdminEventEditPage from './pages/AdminEventEditPage'
 import AdminWebsitePhotosPage from './pages/AdminWebsitePhotosPage'
+import AdminMembersPage from './pages/AdminMembersPage'
 
 import './App.css'
 import './auth.css'
@@ -121,15 +122,7 @@ function App() {
               <Route index element={<AdminPage />} />
               <Route path="events/:id/edit" element={<AdminEventEditPage />} />
               
-              <Route
-                path="members"
-                element={
-                  <AdminModulePage
-                    title="Members"
-                    description="Data anggota, pencarian nama, dan detail profil akan tersedia di sini."
-                  />
-                }
-              />
+              <Route path="members" element={<AdminMembersPage />} />
 
               <Route
                 path="devotions"

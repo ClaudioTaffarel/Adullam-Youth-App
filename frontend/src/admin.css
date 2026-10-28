@@ -1474,3 +1474,253 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ===== ADMIN MEMBERS ===== */
+
+.ay-members-search {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.ay-members-search > div {
+  display: grid;
+  flex: 1 1 240px;
+  gap: 8px;
+}
+
+.ay-members-search label {
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.ay-members-search input {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 14px;
+  border: 1px solid #cdbcaa;
+  border-radius: 9px;
+  background: var(--admin-paper);
+  color: var(--admin-ink);
+  font: inherit;
+  font-size: 16px;
+}
+
+.ay-members-search input:focus-visible,
+.ay-members-table-wrap:focus-visible {
+  outline: 3px solid rgb(245 130 70 / 40%);
+  outline-offset: 3px;
+}
+
+.ay-members-count {
+  margin: 0 0 16px;
+  color: var(--admin-muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.ay-members-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--admin-line);
+  border-radius: 14px;
+  background: var(--admin-paper);
+}
+
+.ay-members-table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.ay-members-table th {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--admin-line);
+  background: #eee6d8;
+  color: #77604d;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.ay-members-table td {
+  padding: 19px 20px;
+  border-bottom: 1px solid var(--admin-line);
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.ay-members-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.ay-members-table tbody tr:hover {
+  background: #fff7e9;
+}
+
+.ay-member-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ay-member-initial {
+  display: grid;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid #b89570;
+  border-radius: 12px;
+  background: #f7da7a;
+  color: #38251d;
+  font-size: 17px;
+  font-weight: 850;
+}
+
+.ay-member-cell > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.ay-member-cell strong {
+  max-width: 300px;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.ay-member-cell div > span {
+  max-width: 300px;
+  color: var(--admin-muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+
+.ay-member-role {
+  display: inline-block;
+  padding: 5px 10px;
+  border: 1px solid #d4c5b2;
+  border-radius: 999px;
+  background: #f3eee5;
+  color: #74624f;
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.ay-member-role.is-admin {
+  border-color: #c18a59;
+  background: #f8d7ae;
+  color: #814321;
+}
+
+.ay-members-table time {
+  white-space: nowrap;
+}
+
+/* ===== MEMBER DETAIL ===== */
+
+.ay-member-dialog {
+  position: fixed;
+  inset: 0;
+  width: min(520px, calc(100% - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 40px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  border: 2px solid #38251d;
+  border-radius: 18px;
+  background: #fffcf6;
+  color: #38251d;
+  box-shadow: 7px 7px 0 rgb(56 37 29 / 25%);
+}
+
+.ay-member-dialog::backdrop {
+  background: rgb(35 23 18 / 55%);
+  backdrop-filter: blur(4px);
+}
+
+.ay-member-dialog-panel {
+  padding: 28px;
+}
+
+.ay-member-dialog-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.ay-member-dialog-top .ay-admin-label {
+  margin: 0;
+}
+
+.ay-member-profile-heading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.ay-member-profile-heading > .ay-member-initial {
+  width: 60px;
+  height: 60px;
+  border-radius: 17px;
+  font-size: 26px;
+}
+
+.ay-member-profile-heading > div {
+  min-width: 0;
+}
+
+.ay-member-profile-heading h2 {
+  margin: 0 0 8px;
+  font-size: 25px;
+  line-height: 1.2;
+  letter-spacing: -0.8px;
+  overflow-wrap: anywhere;
+}
+
+.ay-member-details {
+  margin: 0;
+}
+
+.ay-member-details > div {
+  padding: 16px 0;
+  border-top: 1px solid #e3d8ca;
+}
+
+.ay-member-details dt {
+  margin-bottom: 6px;
+  color: #77675c;
+  font-size: 11px;
+}
+
+.ay-member-details dd {
+  margin: 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.ay-member-details .ay-member-id {
+  color: #77675c;
+  font-size: 11px;
+}
+
+@media (max-width: 600px) {
+  .ay-members-search > div {
+    flex-basis: 100%;
+  }
+
+  .ay-members-search > button {
+    flex: 1;
+  }
+
+  .ay-member-dialog-panel {
+    padding: 22px;
+  }
+}
